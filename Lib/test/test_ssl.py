@@ -3877,7 +3877,7 @@ class ThreadedTests(unittest.TestCase):
         # client 1.0, server 1.2 (mismatch)
         server_context.minimum_version = ssl.TLSVersion.TLSv1_2
         server_context.maximum_version = ssl.TLSVersion.TLSv1_2
-        client_context.minimum_version = ssl.TLSVersion.TLSv1
+        client_context.maximum_version = ssl.TLSVersion.TLSv1
         client_context.maximum_version = ssl.TLSVersion.TLSv1
         seclevel_workaround(client_context, server_context)
 
@@ -4732,50 +4732,16 @@ class TestSSLDebug(unittest.TestCase):
                                             server_hostname=hostname) as s:
                 s.connect((HOST, server.port))
 
-        self.assertEqual(msg, [
-            ("write", TLSVersion.TLSv1, _TLSContentType.HEADER,
-             _TLSMessageType.CERTIFICATE_STATUS),
-            ("write", TLSVersion.TLSv1_2, _TLSContentType.HANDSHAKE,
-             _TLSMessageType.CLIENT_HELLO),
-            ("read", TLSVersion.TLSv1_2, _TLSContentType.HEADER,
-             _TLSMessageType.CERTIFICATE_STATUS),
-            ("read", TLSVersion.TLSv1_2, _TLSContentType.HANDSHAKE,
-             _TLSMessageType.SERVER_HELLO),
-            ("read", TLSVersion.TLSv1_2, _TLSContentType.HEADER,
-             _TLSMessageType.CERTIFICATE_STATUS),
-            ("read", TLSVersion.TLSv1_2, _TLSContentType.HANDSHAKE,
-             _TLSMessageType.CERTIFICATE),
-            ("read", TLSVersion.TLSv1_2, _TLSContentType.HEADER,
-             _TLSMessageType.CERTIFICATE_STATUS),
+        self.assertIn(
             ("read", TLSVersion.TLSv1_2, _TLSContentType.HANDSHAKE,
              _TLSMessageType.SERVER_KEY_EXCHANGE),
-            ("read", TLSVersion.TLSv1_2, _TLSContentType.HEADER,
-             _TLSMessageType.CERTIFICATE_STATUS),
-            ("read", TLSVersion.TLSv1_2, _TLSContentType.HANDSHAKE,
-             _TLSMessageType.SERVER_DONE),
-            ("write", TLSVersion.TLSv1_2, _TLSContentType.HEADER,
-             _TLSMessageType.CERTIFICATE_STATUS),
-            ("write", TLSVersion.TLSv1_2, _TLSContentType.HANDSHAKE,
-             _TLSMessageType.CLIENT_KEY_EXCHANGE),
-            ("write", TLSVersion.TLSv1_2, _TLSContentType.HEADER,
-             _TLSMessageType.FINISHED),
+            msg
+        )
+        self.assertIn(
             ("write", TLSVersion.TLSv1_2, _TLSContentType.CHANGE_CIPHER_SPEC,
              _TLSMessageType.CHANGE_CIPHER_SPEC),
-            ("write", TLSVersion.TLSv1_2, _TLSContentType.HEADER,
-             _TLSMessageType.CERTIFICATE_STATUS),
-            ("write", TLSVersion.TLSv1_2, _TLSContentType.HANDSHAKE,
-             _TLSMessageType.FINISHED),
-            ("read", TLSVersion.TLSv1_2, _TLSContentType.HEADER,
-             _TLSMessageType.CERTIFICATE_STATUS),
-            ("read", TLSVersion.TLSv1_2, _TLSContentType.HANDSHAKE,
-             _TLSMessageType.NEWSESSION_TICKET),
-            ("read", TLSVersion.TLSv1_2, _TLSContentType.HEADER,
-             _TLSMessageType.FINISHED),
-            ("read", TLSVersion.TLSv1_2, _TLSContentType.HEADER,
-             _TLSMessageType.CERTIFICATE_STATUS),
-            ("read", TLSVersion.TLSv1_2, _TLSContentType.HANDSHAKE,
-             _TLSMessageType.FINISHED),
-        ])
+            msg
+        )
 
 
 def test_main(verbose=False):
