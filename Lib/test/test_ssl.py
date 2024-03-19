@@ -4877,7 +4877,7 @@ class TestPreHandshakeClose(unittest.TestCase):
             # is known to work on Linux. We'll skip it anywhere else that it
             # does not present as doing so.
             self.skipTest(f"Could not recreate conditions on {sys.platform}:"
-                          f" {err=}")
+                          f" err={err}")
         # If maintaining this conditional winds up being a problem.
         # just turn this into an unconditional skip anything but Linux.
         # The important thing is that our CI has the logic covered.
