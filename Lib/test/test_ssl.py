@@ -31,13 +31,14 @@ except ImportError:
 
 ssl = support.import_module("ssl")
 
-from ssl import TLSVersion, _TLSContentType, _TLSMessageType, _TLSAlertType
+from ssl import TLSVersion, _TLSContentType, _TLSMessageType
 
 PROTOCOLS = sorted(ssl._PROTOCOL_NAMES)
 HOST = support.HOST
 IS_LIBRESSL = ssl.OPENSSL_VERSION.startswith('LibreSSL')
 IS_OPENSSL_1_1_0 = not IS_LIBRESSL and ssl.OPENSSL_VERSION_INFO >= (1, 1, 0)
 IS_OPENSSL_1_1_1 = not IS_LIBRESSL and ssl.OPENSSL_VERSION_INFO >= (1, 1, 1)
+IS_OPENSSL_3_0_0 = not IS_LIBRESSL and ssl.OPENSSL_VERSION_INFO >= (3, 0, 0)
 PY_SSL_DEFAULT_CIPHERS = sysconfig.get_config_var('PY_SSL_DEFAULT_CIPHERS')
 
 PROTOCOL_TO_TLS_VERSION = {}
@@ -150,6 +151,9 @@ OP_CIPHER_SERVER_PREFERENCE = getattr(ssl, "OP_CIPHER_SERVER_PREFERENCE", 0)
 OP_ENABLE_MIDDLEBOX_COMPAT = getattr(ssl, "OP_ENABLE_MIDDLEBOX_COMPAT", 0)
 OP_IGNORE_UNEXPECTED_EOF = getattr(ssl, "OP_IGNORE_UNEXPECTED_EOF", 0)
 
+# *_TIMEOUT constants are available in test.support in 3.9+
+SHORT_TIMEOUT = 30.0
+
 # Ubuntu has patched OpenSSL and changed behavior of security level 2
 # see https://bugs.python.org/issue41561#msg389003
 def is_ubuntu():
@@ -212,6 +216,10 @@ def has_tls_version(version):
 
     # check compile time flags like ssl.HAS_TLSv1_2
     if not getattr(ssl, f'HAS_{version.name}'):
+        return False
+
+    if IS_OPENSSL_3_0_0 and version < ssl.TLSVersion.TLSv1_2:
+        # bpo43791: 3.0.0-alpha14 fails with TLSV1_ALERT_INTERNAL_ERROR
         return False
 
     # check runtime and dynamic crypto policy settings. A TLS version may
@@ -307,22 +315,6 @@ def asn1time(cert_time):
             cert_time = cert_time[:4] + " " + cert_time[5:]
 
     return cert_time
-
-# Issue #9415: Ubuntu hijacks their OpenSSL and forcefully disables SSLv2
-def skip_if_broken_ubuntu_ssl(func):
-    if hasattr(ssl, 'PROTOCOL_SSLv2'):
-        @functools.wraps(func)
-        def f(*args, **kwargs):
-            try:
-                ssl.SSLContext(ssl.PROTOCOL_SSLv2)
-            except ssl.SSLError:
-                if (ssl.OPENSSL_VERSION_INFO == (0, 9, 8, 15, 15) and
-                    platform.linux_distribution() == ('debian', 'squeeze/sid', '')):
-                    raise unittest.SkipTest("Patched Ubuntu OpenSSL breaks behaviour")
-            return func(*args, **kwargs)
-        return f
-    else:
-        return func
 
 needs_sni = unittest.skipUnless(ssl.HAS_SNI, "SNI support needed for this test")
 
@@ -601,13 +593,17 @@ class BasicSocketTests(unittest.TestCase):
         self.assertLessEqual(patch, 63)
         self.assertGreaterEqual(status, 0)
         self.assertLessEqual(status, 15)
-        # Version string as returned by {Open,Libre}SSL, the format might change
-        if IS_LIBRESSL:
-            self.assertTrue(s.startswith("LibreSSL {:d}".format(major)),
-                            (s, t, hex(n)))
+
+        libressl_ver = f"LibreSSL {major:d}"
+        if major >= 3:
+            # 3.x uses 0xMNN00PP0L
+            openssl_ver = f"OpenSSL {major:d}.{minor:d}.{patch:d}"
         else:
-            self.assertTrue(s.startswith("OpenSSL {:d}.{:d}.{:d}".format(major, minor, fix)),
-                            (s, t, hex(n)))
+            openssl_ver = f"OpenSSL {major:d}.{minor:d}.{fix:d}"
+        self.assertTrue(
+            s.startswith((openssl_ver, libressl_ver)),
+            (s, t, hex(n))
+        )
 
     @support.cpython_only
     def test_refcycle(self):
@@ -1138,7 +1134,6 @@ class BasicSocketTests(unittest.TestCase):
 
 class ContextTests(unittest.TestCase):
 
-    @skip_if_broken_ubuntu_ssl
     def test_constructor(self):
         for protocol in PROTOCOLS:
             if has_tls_protocol(protocol):
@@ -1151,7 +1146,6 @@ class ContextTests(unittest.TestCase):
         self.assertRaises(ValueError, ssl.SSLContext, -1)
         self.assertRaises(ValueError, ssl.SSLContext, 42)
 
-    @skip_if_broken_ubuntu_ssl
     def test_protocol(self):
         for proto in PROTOCOLS:
             ctx = ssl.SSLContext(proto)
@@ -1185,7 +1179,6 @@ class ContextTests(unittest.TestCase):
         self.assertIn('AES256-GCM-SHA384', names)
         self.assertIn('AES128-GCM-SHA256', names)
 
-    @skip_if_broken_ubuntu_ssl
     def test_options(self):
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         # OP_ALL | OP_NO_SSLv2 | OP_NO_SSLv3 is the default value
@@ -1523,7 +1516,6 @@ class ContextTests(unittest.TestCase):
         with self.assertRaises(ssl.SSLError) as cm:
             ctx.load_dh_params(CERTFILE)
 
-    @skip_if_broken_ubuntu_ssl
     def test_session_stats(self):
         for proto in PROTOCOLS:
             ctx = ssl.SSLContext(proto)
@@ -1799,6 +1791,24 @@ class ContextTests(unittest.TestCase):
             self.assertIsInstance(sock, MySSLSocket)
         obj = ctx.wrap_bio(ssl.MemoryBIO(), ssl.MemoryBIO())
         self.assertIsInstance(obj, MySSLObject)
+
+    @unittest.skipUnless(IS_OPENSSL_1_1_1, "Test requires OpenSSL 1.1.1")
+    def test_num_tickest(self):
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        self.assertEqual(ctx.num_tickets, 2)
+        ctx.num_tickets = 1
+        self.assertEqual(ctx.num_tickets, 1)
+        ctx.num_tickets = 0
+        self.assertEqual(ctx.num_tickets, 0)
+        with self.assertRaises(ValueError):
+            ctx.num_tickets = -1
+        with self.assertRaises(TypeError):
+            ctx.num_tickets = None
+
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        self.assertEqual(ctx.num_tickets, 2)
+        with self.assertRaises(ValueError):
+            ctx.num_tickets = 1
 
 
 class SSLErrorTests(unittest.TestCase):
@@ -2302,6 +2312,8 @@ class NetworkedTests(unittest.TestCase):
             rc = s.connect_ex((REMOTE_HOST, 443))
             if rc == 0:
                 self.skipTest("REMOTE_HOST responded too quickly")
+            elif rc == errno.ENETUNREACH:
+                self.skipTest("Network unreachable.")
             self.assertIn(rc, (errno.EAGAIN, errno.EWOULDBLOCK))
 
     @unittest.skipUnless(support.IPV6_ENABLED, 'Needs IPv6')
@@ -2390,9 +2402,14 @@ class ThreadedEchoServer(threading.Thread):
                 self.server.conn_errors.append(str(e))
                 if self.server.chatty:
                     handle_error("\n server:  bad connection attempt from " + repr(self.addr) + ":\n")
-                self.running = False
-                self.server.stop()
-                self.close()
+
+                # bpo-44229, bpo-43855, bpo-44237, and bpo-33450:
+                # Ignore spurious EPROTOTYPE returned by write() on macOS.
+                # See also http://erickt.github.io/blog/2014/11/19/adventures-in-debugging-a-potential-osx-kernel-bug/
+                if e.errno != errno.EPROTOTYPE and sys.platform != "darwin":
+                    self.running = False
+                    self.server.stop()
+                    self.close()
                 return False
             else:
                 self.server.shared_ciphers.append(self.sslconn.shared_ciphers())
@@ -2855,7 +2872,6 @@ def try_protocol_combo(server_protocol, client_protocol, expect_success,
 
 class ThreadedTests(unittest.TestCase):
 
-    @skip_if_broken_ubuntu_ssl
     def test_echo(self):
         """Basic test of an SSL client connecting to a server"""
         if support.verbose:
@@ -3298,7 +3314,6 @@ class ThreadedTests(unittest.TestCase):
         try_protocol_combo(ssl.PROTOCOL_SSLv2, ssl.PROTOCOL_TLS, False,
                            client_options=ssl.OP_NO_TLSv1)
 
-    @skip_if_broken_ubuntu_ssl
     def test_PROTOCOL_TLS(self):
         """Connecting to an SSLv23 server with various client options"""
         if support.verbose:
@@ -3823,7 +3838,7 @@ class ThreadedTests(unittest.TestCase):
         client_context, server_context, hostname = testing_context()
         # OpenSSL enables all TLS 1.3 ciphers, enforce TLS 1.2 for test
         client_context.options |= ssl.OP_NO_TLSv1_3
-        # Force different suites on client and master
+        # Force different suites on client and server
         client_context.set_ciphers("AES128")
         server_context.set_ciphers("AES256")
         with ThreadedEchoServer(context=server_context) as server:
@@ -3910,13 +3925,14 @@ class ThreadedTests(unittest.TestCase):
 
     @requires_minimum_version
     @requires_tls_version('TLSv1_2')
+    @requires_tls_version('TLSv1')
     def test_min_max_version_mismatch(self):
         client_context, server_context, hostname = testing_context()
         # client 1.0, server 1.2 (mismatch)
-        server_context.minimum_version = ssl.TLSVersion.TLSv1_2
         server_context.maximum_version = ssl.TLSVersion.TLSv1_2
+        server_context.minimum_version = ssl.TLSVersion.TLSv1_2
         client_context.maximum_version = ssl.TLSVersion.TLSv1
-        client_context.maximum_version = ssl.TLSVersion.TLSv1
+        client_context.minimum_version = ssl.TLSVersion.TLSv1
         seclevel_workaround(client_context, server_context)
 
         with ThreadedEchoServer(context=server_context) as server:
@@ -4505,6 +4521,8 @@ class TestPostHandshakeAuth(unittest.TestCase):
         server_context.verify_mode = ssl.CERT_REQUIRED
         client_context.post_handshake_auth = True
 
+        # Ignore expected SSLError in ConnectionHandler of ThreadedEchoServer
+        # (it is only raised sometimes on Windows)
         server = ThreadedEchoServer(context=server_context, chatty=False)
         with server:
             with client_context.wrap_socket(socket.socket(),
@@ -4814,12 +4832,16 @@ class TestPreHandshakeClose(unittest.TestCase):
 
     class SingleConnectionTestServerThread(threading.Thread):
 
-        def __init__(self, *, name, call_after_accept):
+        def __init__(self, *, name, call_after_accept, timeout=None):
             self.call_after_accept = call_after_accept
             self.received_data = b''  # set by .run()
             self.wrap_error = None  # set by .run()
             self.listener = None  # set by .start()
             self.port = None  # set by .start()
+            if timeout is None:
+                self.timeout = SHORT_TIMEOUT
+            else:
+                self.timeout = timeout
             super().__init__(name=name)
 
         def __enter__(self):
@@ -4842,13 +4864,19 @@ class TestPreHandshakeClose(unittest.TestCase):
             self.ssl_ctx.load_cert_chain(certfile=ONLYCERT, keyfile=ONLYKEY)
             self.listener = socket.socket()
             self.port = support.bind_port(self.listener)
-            self.listener.settimeout(2.0)
+            self.listener.settimeout(self.timeout)
             self.listener.listen(1)
             super().start()
 
         def run(self):
-            conn, address = self.listener.accept()
-            self.listener.close()
+            try:
+                conn, address = self.listener.accept()
+            except TimeoutError:
+                # on timeout, just close the listener
+                return
+            finally:
+                self.listener.close()
+
             with conn:
                 if self.call_after_accept(conn):
                     return
@@ -4876,8 +4904,13 @@ class TestPreHandshakeClose(unittest.TestCase):
             # we're specifically trying to test. The way this test is written
             # is known to work on Linux. We'll skip it anywhere else that it
             # does not present as doing so.
-            self.skipTest(f"Could not recreate conditions on {sys.platform}:"
-                          f" err={err}")
+            try:
+                self.skipTest(f"Could not recreate conditions on {sys.platform}:"
+                              f" err={err}")
+            finally:
+                # gh-108342: Explicitly break the reference cycle
+                err = None
+
         # If maintaining this conditional winds up being a problem.
         # just turn this into an unconditional skip anything but Linux.
         # The important thing is that our CI has the logic covered.
@@ -4888,7 +4921,7 @@ class TestPreHandshakeClose(unittest.TestCase):
 
         def call_after_accept(unused):
             server_accept_called.set()
-            if not ready_for_server_wrap_socket.wait(2.0):
+            if not ready_for_server_wrap_socket.wait(SHORT_TIMEOUT):
                 raise RuntimeError("wrap_socket event never set, test may fail.")
             return False  # Tell the server thread to continue.
 
@@ -4910,20 +4943,31 @@ class TestPreHandshakeClose(unittest.TestCase):
 
         ready_for_server_wrap_socket.set()
         server.join()
+
         wrap_error = server.wrap_error
-        self.assertEqual(b"", server.received_data)
-        self.assertIsInstance(wrap_error, OSError)  # All platforms.
-        self.non_linux_skip_if_other_okay_error(wrap_error)
-        self.assertIsInstance(wrap_error, ssl.SSLError)
-        self.assertIn("before TLS handshake with data", wrap_error.args[1])
-        self.assertIn("before TLS handshake with data", wrap_error.reason)
-        self.assertNotEqual(0, wrap_error.args[0])
-        self.assertIsNone(wrap_error.library, msg="attr must exist")
+        server.wrap_error = None
+        try:
+            self.assertEqual(b"", server.received_data)
+            self.assertIsInstance(wrap_error, OSError)  # All platforms.
+            self.non_linux_skip_if_other_okay_error(wrap_error)
+            self.assertIsInstance(wrap_error, ssl.SSLError)
+            self.assertIn("before TLS handshake with data", wrap_error.args[1])
+            self.assertIn("before TLS handshake with data", wrap_error.reason)
+            self.assertNotEqual(0, wrap_error.args[0])
+            self.assertIsNone(wrap_error.library, msg="attr must exist")
+        finally:
+            # gh-108342: Explicitly break the reference cycle
+            wrap_error = None
+            server = None
 
     def test_preauth_data_to_tls_client(self):
+        server_can_continue_with_wrap_socket = threading.Event()
         client_can_continue_with_wrap_socket = threading.Event()
 
         def call_after_accept(conn_to_client):
+            if not server_can_continue_with_wrap_socket.wait(SHORT_TIMEOUT):
+                print("ERROR: test client took too long")
+
             # This forces an immediate connection close via RST on .close().
             set_socket_so_linger_on_with_zero_timeout(conn_to_client)
             conn_to_client.send(
@@ -4945,8 +4989,10 @@ class TestPreHandshakeClose(unittest.TestCase):
 
         with socket.socket() as client:
             client.connect(server.listener.getsockname())
-            if not client_can_continue_with_wrap_socket.wait(2.0):
-                self.fail("test server took too long.")
+            server_can_continue_with_wrap_socket.set()
+
+            if not client_can_continue_with_wrap_socket.wait(SHORT_TIMEOUT):
+                self.fail("test server took too long")
             ssl_ctx = ssl.create_default_context()
             try:
                 tls_client = ssl_ctx.wrap_socket(
@@ -4960,24 +5006,31 @@ class TestPreHandshakeClose(unittest.TestCase):
                 tls_client.close()
 
         server.join()
-        self.assertEqual(b"", received_data)
-        self.assertIsInstance(wrap_error, OSError)  # All platforms.
-        self.non_linux_skip_if_other_okay_error(wrap_error)
-        self.assertIsInstance(wrap_error, ssl.SSLError)
-        self.assertIn("before TLS handshake with data", wrap_error.args[1])
-        self.assertIn("before TLS handshake with data", wrap_error.reason)
-        self.assertNotEqual(0, wrap_error.args[0])
-        self.assertIsNone(wrap_error.library, msg="attr must exist")
+        try:
+            self.assertEqual(b"", received_data)
+            self.assertIsInstance(wrap_error, OSError)  # All platforms.
+            self.non_linux_skip_if_other_okay_error(wrap_error)
+            self.assertIsInstance(wrap_error, ssl.SSLError)
+            self.assertIn("before TLS handshake with data", wrap_error.args[1])
+            self.assertIn("before TLS handshake with data", wrap_error.reason)
+            self.assertNotEqual(0, wrap_error.args[0])
+            self.assertIsNone(wrap_error.library, msg="attr must exist")
+        finally:
+            # gh-108342: Explicitly break the reference cycle
+            wrap_error = None
+            server = None
 
     def test_https_client_non_tls_response_ignored(self):
-
         server_responding = threading.Event()
 
         class SynchronizedHTTPSConnection(http.client.HTTPSConnection):
             def connect(self):
+                # Call clear text HTTP connect(), not the encrypted HTTPS (TLS)
+                # connect(): wrap_socket() is called manually below.
                 http.client.HTTPConnection.connect(self)
+
                 # Wait for our fault injection server to have done its thing.
-                if not server_responding.wait(1.0) and support.verbose:
+                if not server_responding.wait(SHORT_TIMEOUT) and support.verbose:
                     sys.stdout.write("server_responding event never set.")
                 self.sock = self._context.wrap_socket(
                         self.sock, server_hostname=self.host)
@@ -5001,7 +5054,7 @@ class TestPreHandshakeClose(unittest.TestCase):
         set_socket_so_linger_on_with_zero_timeout(server.listener)
 
         connection = SynchronizedHTTPSConnection(
-                f"localhost",
+                server.listener.getsockname()[0],
                 port=server.port,
                 context=ssl.create_default_context(),
                 timeout=2.0,
@@ -5011,33 +5064,24 @@ class TestPreHandshakeClose(unittest.TestCase):
         # socket; that fails if the connection is broken. It may seem pointless
         # to test this. It serves as an illustration of something that we never
         # want to happen... properly not happening.
-        with self.assertRaises(OSError) as err_ctx:
+        with self.assertRaises(OSError):
             connection.request("HEAD", "/test", headers={"Host": "localhost"})
             response = connection.getresponse()
 
 
 def test_main(verbose=False):
     if support.verbose:
-        import warnings
         plats = {
-            'Linux': platform.linux_distribution,
             'Mac': platform.mac_ver,
             'Windows': platform.win32_ver,
         }
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                'ignore',
-                r'dist\(\) and linux_distribution\(\) '
-                'functions are deprecated .*',
-                DeprecationWarning,
-            )
-            for name, func in plats.items():
-                plat = func()
-                if plat and plat[0]:
-                    plat = '%s %r' % (name, plat)
-                    break
-            else:
-                plat = repr(platform.platform())
+        for name, func in plats.items():
+            plat = func()
+            if plat and plat[0]:
+                plat = '%s %r' % (name, plat)
+                break
+        else:
+            plat = repr(platform.platform())
         print("test_ssl: testing with %r %r" %
             (ssl.OPENSSL_VERSION, ssl.OPENSSL_VERSION_INFO))
         print("          under %s" % plat)
@@ -5059,7 +5103,7 @@ def test_main(verbose=False):
     tests = [
         ContextTests, BasicSocketTests, SSLErrorTests, MemoryBIOTests,
         SSLObjectTests, SimpleBackgroundTests, ThreadedTests,
-        TestPostHandshakeAuth, TestSSLDebug
+        TestPostHandshakeAuth, TestSSLDebug, TestPreHandshakeClose
     ]
 
     if support.is_resource_enabled('network'):
