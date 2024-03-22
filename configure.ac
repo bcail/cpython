@@ -2152,7 +2152,7 @@ dnl AC_MSG_RESULT($cpp_type)
 
 # checks for header files
 AC_HEADER_STDC
-AC_CHECK_HEADERS(asm/types.h crypt.h conio.h direct.h dlfcn.h errno.h \
+AC_CHECK_HEADERS(asm/types.h conio.h direct.h dlfcn.h errno.h \
 fcntl.h grp.h \
 ieeefp.h io.h langinfo.h libintl.h process.h pthread.h \
 sched.h shadow.h signal.h stropts.h termios.h \
@@ -3896,23 +3896,6 @@ AC_CHECK_FUNCS(gettimeofday,
       [Define if gettimeofday() does not have second (timezone) argument
        This is the case on Motorola V4 (R40V4.2)])
     ])
-)
-
-# We search for both crypt and crypt_r as one or the other may be defined
-# This gets us our -lcrypt in LIBS when required on the target platform.
-AC_SEARCH_LIBS(crypt, crypt)
-AC_SEARCH_LIBS(crypt_r, crypt)
-
-AC_CHECK_FUNC(crypt_r,
-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-#define _GNU_SOURCE  /* Required for crypt_r()'s prototype in glibc. */
-#include <crypt.h>
-]], [[
-struct crypt_data d;
-char *r = crypt_r("", "", &d);
-]])],
-    [AC_DEFINE(HAVE_CRYPT_R, 1, [Define if you have the crypt_r() function.])],
-    [])
 )
 
 AC_CHECK_FUNCS(clock_gettime, [], [

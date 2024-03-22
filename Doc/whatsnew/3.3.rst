@@ -1052,7 +1052,7 @@ crypt
 -----
 
 Addition of salt and modular crypt format (hashing method) and the :func:`~crypt.mksalt`
-function to the :mod:`crypt` module.
+function to the :mod:`!crypt` module.
 
 (:issue:`10924`)
 

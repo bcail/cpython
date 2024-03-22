@@ -901,14 +901,6 @@ class PyBuildExt(build_ext):
         else:
             missing.append('readline')
 
-        # crypt module.
-
-        if self.compiler.find_library_file(lib_dirs, 'crypt'):
-            libs = ['crypt']
-        else:
-            libs = []
-        exts.append( Extension('_crypt', ['_cryptmodule.c'], libraries=libs) )
-
         # CSV files
         exts.append( Extension('_csv', ['_csv.c']) )
 

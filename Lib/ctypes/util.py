@@ -363,14 +363,10 @@ def test():
             else:
                 print(f"Using CDLL(name, os.RTLD_MEMBER): {CDLL('libc.a(shr_64.o)', os.RTLD_MEMBER)}")
                 print(f"Using cdll.LoadLibrary(): {cdll.LoadLibrary('libc.a(shr_64.o)')}")
-            print(f"crypt\t:: {find_library('crypt')}")
-            print(f"crypt\t:: {cdll.LoadLibrary(find_library('crypt'))}")
             print(f"crypto\t:: {find_library('crypto')}")
             print(f"crypto\t:: {cdll.LoadLibrary(find_library('crypto'))}")
         else:
             print(cdll.LoadLibrary("libm.so"))
-            print(cdll.LoadLibrary("libcrypt.so"))
-            print(find_library("crypt"))
 
 if __name__ == "__main__":
     test()

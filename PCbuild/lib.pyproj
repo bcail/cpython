@@ -78,7 +78,6 @@
     <Compile Include="copy.py" />
     <Compile Include="copyreg.py" />
     <Compile Include="cProfile.py" />
-    <Compile Include="crypt.py" />
     <Compile Include="csv.py" />
     <Compile Include="ctypes\macholib\dyld.py" />
     <Compile Include="ctypes\macholib\dylib.py" />
@@ -951,7 +950,6 @@
     <Compile Include="test\test_coroutines.py" />
     <Compile Include="test\test_cprofile.py" />
     <Compile Include="test\test_crashers.py" />
-    <Compile Include="test\test_crypt.py" />
     <Compile Include="test\test_csv.py" />
     <Compile Include="test\test_ctypes.py" />
     <Compile Include="test\test_curses.py" />
