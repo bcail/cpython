@@ -7,9 +7,11 @@ on:
   push:
     branches:
     - 3.7-updated
+    - custom
   pull_request:
     branches:
     - 3.7-updated
+    - custom
 
 jobs:
   check_source:
