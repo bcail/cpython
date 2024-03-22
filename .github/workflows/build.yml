@@ -4,11 +4,12 @@ name: Tests
 # it prevents to mark a job as mandatory. A PR cannot be merged if a job is
 # mandatory but not scheduled because of "paths-ignore".
 on:
+  push:
+    branches:
+    - 3.7-updated
   pull_request:
     branches:
-    - master
-    - 3.8
-    - 3.7
+    - 3.7-updated
 
 jobs:
   check_source:
