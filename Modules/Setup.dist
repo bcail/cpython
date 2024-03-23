@@ -217,7 +217,6 @@ _symtable symtablemodule.c
 # Some more UNIX dependent modules -- off by default, since these
 # are not supported by all UNIX systems:
 
-#nis nismodule.c -lnsl	# Sun yellow pages -- not everywhere
 #termios termios.c	# Steen Lumholt's termios module
 #resource resource.c	# Jeremy Hylton's rlimit interface
 

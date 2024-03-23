@@ -2950,8 +2950,7 @@ LDFLAGS="-fsanitize=undefined $LDFLAGS"
 ],
 [AC_MSG_RESULT(no)])
 
-# Most SVR4 platforms (e.g. Solaris) need -lsocket and -lnsl.
-AC_CHECK_LIB(nsl, t_open, [LIBS="-lnsl $LIBS"]) # SVR4
+# Most SVR4 platforms (e.g. Solaris) need -lsocket.
 AC_CHECK_LIB(socket, socket, [LIBS="-lsocket $LIBS"], [], $LIBS) # SVR4 sockets
 
 AC_MSG_CHECKING(for --with-libs)

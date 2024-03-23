@@ -1366,12 +1366,6 @@ class PyBuildExt(build_ext):
         else:
             missing.extend(['resource', 'termios'])
 
-        nis = self._detect_nis(inc_dirs, lib_dirs)
-        if nis is not None:
-            exts.append(nis)
-        else:
-            missing.append('nis')
-
         # Curses support, requiring the System V version of curses, often
         # provided by the ncurses library.
         curses_defines = []
@@ -2222,51 +2216,6 @@ class PyBuildExt(build_ext):
         )
 
         return ssl_ext, hashlib_ext
-
-    def _detect_nis(self, inc_dirs, lib_dirs):
-        if host_platform in {'win32', 'cygwin', 'qnx6'}:
-            return None
-
-        libs = []
-        library_dirs = []
-        includes_dirs = []
-
-        # bpo-32521: glibc has deprecated Sun RPC for some time. Fedora 28
-        # moved headers and libraries to libtirpc and libnsl. The headers
-        # are in tircp and nsl sub directories.
-        rpcsvc_inc = find_file(
-            'rpcsvc/yp_prot.h', inc_dirs,
-            [os.path.join(inc_dir, 'nsl') for inc_dir in inc_dirs]
-        )
-        rpc_inc = find_file(
-            'rpc/rpc.h', inc_dirs,
-            [os.path.join(inc_dir, 'tirpc') for inc_dir in inc_dirs]
-        )
-        if rpcsvc_inc is None or rpc_inc is None:
-            # not found
-            return None
-        includes_dirs.extend(rpcsvc_inc)
-        includes_dirs.extend(rpc_inc)
-
-        if self.compiler.find_library_file(lib_dirs, 'nsl'):
-            libs.append('nsl')
-        else:
-            # libnsl-devel: check for libnsl in nsl/ subdirectory
-            nsl_dirs = [os.path.join(lib_dir, 'nsl') for lib_dir in lib_dirs]
-            libnsl = self.compiler.find_library_file(nsl_dirs, 'nsl')
-            if libnsl is not None:
-                library_dirs.append(os.path.dirname(libnsl))
-                libs.append('nsl')
-
-        if self.compiler.find_library_file(lib_dirs, 'tirpc'):
-            libs.append('tirpc')
-
-        return Extension(
-            'nis', ['nismodule.c'],
-            libraries=libs,
-            library_dirs=library_dirs,
-            include_dirs=includes_dirs
-        )
 
 
 class PyBuildInstall(install):
