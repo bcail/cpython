@@ -25,7 +25,7 @@ class TestSundryScripts(unittest.TestCase):
     # scripts that use windows-only modules
     windows_only = ['win_add2path']
     # blacklisted for other reasons
-    other = ['analyze_dxp', '2to3']
+    other = ['analyze_dxp']
 
     skiplist = blacklist + whitelist + windows_only + other
 

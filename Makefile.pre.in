@@ -1115,7 +1115,7 @@ buildbottest:	build_all platform
 pythoninfo: build_all
 		$(RUNSHARED) ./$(BUILDPYTHON) -m test.pythoninfo
 
-QUICKTESTOPTS=	$(TESTOPTS) -x test_subprocess test_io test_lib2to3 \
+QUICKTESTOPTS=	$(TESTOPTS) -x test_subprocess test_io \
 		test_multibytecodec test_urllib2_localnet test_itertools \
 		test_multiprocessing_fork test_multiprocessing_spawn \
 		test_multiprocessing_forkserver \
@@ -1245,8 +1245,6 @@ bininstall: altbininstall
 	(cd $(DESTDIR)$(BINDIR); $(LN) -s idle$(VERSION) idle3)
 	-rm -f $(DESTDIR)$(BINDIR)/pydoc3
 	(cd $(DESTDIR)$(BINDIR); $(LN) -s pydoc$(VERSION) pydoc3)
-	-rm -f $(DESTDIR)$(BINDIR)/2to3
-	(cd $(DESTDIR)$(BINDIR); $(LN) -s 2to3-$(VERSION) 2to3)
 	-rm -f $(DESTDIR)$(BINDIR)/pyvenv
 	(cd $(DESTDIR)$(BINDIR); $(LN) -s pyvenv-$(VERSION) pyvenv)
 	if test "x$(LIPO_32BIT_FLAGS)" != "x" ; then \
@@ -1337,9 +1335,6 @@ LIBSUBDIRS=	tkinter tkinter/test tkinter/test/test_tkinter \
 		html json test/test_json http dbm xmlrpc \
 		sqlite3 sqlite3/test \
 		logging csv wsgiref urllib \
-		lib2to3 lib2to3/fixes lib2to3/pgen2 lib2to3/tests \
-		lib2to3/tests/data lib2to3/tests/data/fixers \
-		lib2to3/tests/data/fixers/myfixes \
 		ctypes ctypes/test ctypes/macholib \
 		idlelib idlelib/Icons idlelib/idle_test \
 		distutils distutils/command distutils/tests $(XMLLIBSUBDIRS) \
@@ -1414,17 +1409,17 @@ libinstall:	build_all $(srcdir)/Modules/xxmodule.c
 	-PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
 		$(PYTHON_FOR_BUILD) -Wi $(DESTDIR)$(LIBDEST)/compileall.py \
 		-d $(LIBDEST) -f \
-		-x 'bad_coding|badsyntax|site-packages|lib2to3/tests/data' \
+		-x 'bad_coding|badsyntax|site-packages' \
 		$(DESTDIR)$(LIBDEST)
 	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
 		$(PYTHON_FOR_BUILD) -Wi -O $(DESTDIR)$(LIBDEST)/compileall.py \
 		-d $(LIBDEST) -f \
-		-x 'bad_coding|badsyntax|site-packages|lib2to3/tests/data' \
+		-x 'bad_coding|badsyntax|site-packages' \
 		$(DESTDIR)$(LIBDEST)
 	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
 		$(PYTHON_FOR_BUILD) -Wi -OO $(DESTDIR)$(LIBDEST)/compileall.py \
 		-d $(LIBDEST) -f \
-		-x 'bad_coding|badsyntax|site-packages|lib2to3/tests/data' \
+		-x 'bad_coding|badsyntax|site-packages' \
 		$(DESTDIR)$(LIBDEST)
 	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
 		$(PYTHON_FOR_BUILD) -Wi $(DESTDIR)$(LIBDEST)/compileall.py \
@@ -1438,10 +1433,6 @@ libinstall:	build_all $(srcdir)/Modules/xxmodule.c
 		$(PYTHON_FOR_BUILD) -Wi -OO $(DESTDIR)$(LIBDEST)/compileall.py \
 		-d $(LIBDEST)/site-packages -f \
 		-x badsyntax $(DESTDIR)$(LIBDEST)/site-packages
-	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
-		$(PYTHON_FOR_BUILD) -m lib2to3.pgen2.driver $(DESTDIR)$(LIBDEST)/lib2to3/Grammar.txt
-	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
-		$(PYTHON_FOR_BUILD) -m lib2to3.pgen2.driver $(DESTDIR)$(LIBDEST)/lib2to3/PatternGrammar.txt
 
 python-config: $(srcdir)/Misc/python-config.in Misc/python-config.sh
 	@ # Substitution happens here, as the completely-expanded BINDIR
@@ -1712,7 +1703,6 @@ clean: pycremoval
 	find build -name '*.py' -exec rm -f {} ';' || true
 	find build -name '*.py[co]' -exec rm -f {} ';' || true
 	-rm -f pybuilddir.txt
-	-rm -f Lib/lib2to3/*Grammar*.pickle
 	-rm -f Programs/_testembed Programs/_freeze_importlib
 	-find build -type f -a ! -name '*.gc??' -exec rm -f {} ';'
 	-rm -f Include/pydtrace_probes.h
