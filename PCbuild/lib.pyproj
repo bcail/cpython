@@ -586,7 +586,6 @@
     <Compile Include="multiprocessing\util.py" />
     <Compile Include="multiprocessing\__init__.py" />
     <Compile Include="netrc.py" />
-    <Compile Include="nntplib.py" />
     <Compile Include="ntpath.py" />
     <Compile Include="nturl2path.py" />
     <Compile Include="numbers.py" />
@@ -1094,7 +1093,6 @@
     <Compile Include="test\test_multiprocessing_spawn.py" />
     <Compile Include="test\test_netrc.py" />
     <Compile Include="test\test_nis.py" />
-    <Compile Include="test\test_nntplib.py" />
     <Compile Include="test\test_normalization.py" />
     <Compile Include="test\test_ntpath.py" />
     <Compile Include="test\test_numeric_tower.py" />

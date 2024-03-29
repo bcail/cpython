@@ -33,7 +33,6 @@ is currently supported on most popular platforms.  Here is an overview:
    ftplib.rst
    poplib.rst
    imaplib.rst
-   nntplib.rst
    smtplib.rst
    smtpd.rst
    telnetlib.rst
