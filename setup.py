@@ -2199,7 +2199,6 @@ class PyBuildExt(build_ext):
                 depends=[
                     'socketmodule.h',
                     '_ssl/debughelpers.c',
-                    '_ssl_data.h',
                     '_ssl_data_111.h',
                     '_ssl_data_300.h',
                 ]
