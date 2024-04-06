@@ -411,7 +411,7 @@ class PyBuildExt(build_ext):
                for l in (missing, self.failed, self.failed_on_import)):
             print()
             print("Could not build the ssl module!")
-            print("Python requires an OpenSSL 1.0.2 or 1.1 compatible "
+            print("Python requires an OpenSSL 1.1 or 1.1 compatible "
                   "libssl with X509_VERIFY_PARAM_set1_host().")
             print("LibreSSL 2.6.4 and earlier do not provide the necessary "
                   "APIs, https://github.com/libressl-portable/portable/issues/381")
@@ -2181,14 +2181,6 @@ class PyBuildExt(build_ext):
         )
         if ssl_incs is None:
             return None, None
-
-        # OpenSSL 1.0.2 uses Kerberos for KRB5 ciphers
-        krb5_h = find_file(
-            'krb5.h', inc_dirs,
-            ['/usr/kerberos/include']
-        )
-        if krb5_h:
-            ssl_incs.extend(krb5_h)
 
         if config_vars.get("HAVE_X509_VERIFY_PARAM_SET1_HOST"):
             ssl_ext = Extension(
