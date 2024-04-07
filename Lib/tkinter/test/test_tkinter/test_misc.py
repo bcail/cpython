@@ -168,7 +168,7 @@ class MiscTest(AbstractTkTest, unittest.TestCase):
         with self.assertRaises(tkinter.TclError):
             root.clipboard_get()
 
-    @unittest.skipIf(os.environ.get('OS_INFO') == 'ubuntu-22.04')
+    @unittest.skipIf(os.environ.get('OS_INFO') == 'ubuntu-22.04', "doesn't work on ubuntu 22.04")
     def test_clipboard_astral(self):
         root = self.root
         root.clipboard_clear()
