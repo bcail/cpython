@@ -411,10 +411,7 @@ class PyBuildExt(build_ext):
                for l in (missing, self.failed, self.failed_on_import)):
             print()
             print("Could not build the ssl module!")
-            print("Python requires an OpenSSL 1.1 or 1.1 compatible "
-                  "libssl with X509_VERIFY_PARAM_set1_host().")
-            print("LibreSSL 2.6.4 and earlier do not provide the necessary "
-                  "APIs, https://github.com/libressl-portable/portable/issues/381")
+            print("Python requires OpenSSL 1.1+.")
             print()
 
     def build_extension(self, ext):
@@ -2182,21 +2179,18 @@ class PyBuildExt(build_ext):
         if ssl_incs is None:
             return None, None
 
-        if config_vars.get("HAVE_X509_VERIFY_PARAM_SET1_HOST"):
-            ssl_ext = Extension(
-                '_ssl', ['_ssl.c'],
-                include_dirs=openssl_includes,
-                library_dirs=openssl_libdirs,
-                libraries=openssl_libs,
-                depends=[
-                    'socketmodule.h',
-                    '_ssl/debughelpers.c',
-                    '_ssl_data_111.h',
-                    '_ssl_data_300.h',
-                ]
-            )
-        else:
-            ssl_ext = None
+        ssl_ext = Extension(
+            '_ssl', ['_ssl.c'],
+            include_dirs=openssl_includes,
+            library_dirs=openssl_libdirs,
+            libraries=openssl_libs,
+            depends=[
+                'socketmodule.h',
+                '_ssl/debughelpers.c',
+                '_ssl_data_111.h',
+                '_ssl_data_300.h',
+            ]
+        )
 
         hashlib_ext = Extension(
             '_hashlib', ['_hashopenssl.c'],
