@@ -113,7 +113,7 @@ except ImportError:
 
 
 from _ssl import (
-    HAS_SNI, HAS_ECDH, HAS_NPN, HAS_ALPN, HAS_SSLv2, HAS_SSLv3, HAS_TLSv1,
+    HAS_SNI, HAS_ECDH, HAS_ALPN, HAS_SSLv2, HAS_SSLv3, HAS_TLSv1,
     HAS_TLSv1_1, HAS_TLSv1_2, HAS_TLSv1_3
 )
 from _ssl import _DEFAULT_CIPHERS, _OPENSSL_API_VERSION
@@ -909,15 +909,13 @@ class SSLObject:
         """Return the currently selected NPN protocol as a string, or ``None``
         if a next protocol was not negotiated or if NPN is not supported by one
         of the peers."""
-        if _ssl.HAS_NPN:
-            return self._sslobj.selected_npn_protocol()
+        pass
 
     def selected_alpn_protocol(self):
         """Return the currently selected ALPN protocol as a string, or ``None``
         if a next protocol was not negotiated or if ALPN is not supported by one
         of the peers."""
-        if _ssl.HAS_ALPN:
-            return self._sslobj.selected_alpn_protocol()
+        return self._sslobj.selected_alpn_protocol()
 
     def cipher(self):
         """Return the currently selected cipher as a 3-tuple ``(name,
@@ -1159,10 +1157,7 @@ class SSLSocket(socket):
     @_sslcopydoc
     def selected_npn_protocol(self):
         self._checkClosed()
-        if self._sslobj is None or not _ssl.HAS_NPN:
-            return None
-        else:
-            return self._sslobj.selected_npn_protocol()
+        return None
 
     @_sslcopydoc
     def selected_alpn_protocol(self):
