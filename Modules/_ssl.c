@@ -146,20 +146,6 @@ extern const SSL_METHOD *TLSv1_1_method(void);
 extern const SSL_METHOD *TLSv1_2_method(void);
 #endif
 
-/* SNI support (client- and server-side) appeared in OpenSSL 1.0.0 and 0.9.8f
- * This includes the SSL_set_SSL_CTX() function.
- */
-#ifdef SSL_CTRL_SET_TLSEXT_HOSTNAME
-# define HAVE_SNI 1
-#else
-# define HAVE_SNI 0
-#endif
-
-# define HAVE_ALPN 1
-
-/* NPN replaced by ALPN (which is supported since 1.0.2) */
-# define HAVE_NPN 0
-
 #if (OPENSSL_VERSION_NUMBER >= 0x10101000L)
 #define HAVE_OPENSSL_KEYLOG 1
 #endif
@@ -2050,11 +2036,6 @@ static int PySSL_set_context(PySSLSocket *self, PyObject *value,
                                    void *closure) {
 
     if (PyObject_TypeCheck(value, &PySSLContext_Type)) {
-#if !HAVE_SNI
-        PyErr_SetString(PyExc_NotImplementedError, "setting a socket's "
-                        "context is not supported by your OpenSSL library");
-        return -1;
-#else
         Py_INCREF(value);
         Py_SETREF(self->ctx, (PySSLContext *)value);
         SSL_set_SSL_CTX(self->ssl, self->ctx->ctx);
@@ -2063,7 +2044,6 @@ static int PySSL_set_context(PySSLSocket *self, PyObject *value,
             self->ssl,
             self->ctx->msg_cb ? _PySSL_msg_callback : NULL
         );
-#endif
     } else {
         PyErr_SetString(PyExc_TypeError, "The value must be a SSLContext");
         return -1;
@@ -4248,7 +4228,7 @@ _ssl__SSLContext_set_ecdh_curve(PySSLContext *self, PyObject *name)
 }
 #endif
 
-#if HAVE_SNI && !defined(OPENSSL_NO_TLSEXT)
+#if !defined(OPENSSL_NO_TLSEXT)
 static int
 _servername_callback(SSL *s, int *al, void *args)
 {
@@ -4373,7 +4353,7 @@ set_sni_callback(PySSLContext *self, PyObject *arg, void *c)
                         "sni_callback cannot be set on TLS_CLIENT context");
         return -1;
     }
-#if HAVE_SNI && !defined(OPENSSL_NO_TLSEXT)
+#if !defined(OPENSSL_NO_TLSEXT)
     Py_CLEAR(self->set_sni_cb);
     if (arg == Py_None) {
         SSL_CTX_set_tlsext_servername_callback(self->ctx, NULL);
@@ -5954,11 +5934,7 @@ PyInit__ssl(void)
     Py_INCREF((b) ? Py_True : Py_False); \
     PyModule_AddObject((m), (v), (b) ? Py_True : Py_False);
 
-#if HAVE_SNI
-    addbool(m, "HAS_SNI", 1);
-#else
-    addbool(m, "HAS_SNI", 0);
-#endif
+addbool(m, "HAS_SNI", 1);
 
     addbool(m, "HAS_TLS_UNIQUE", 1);
 
