@@ -165,11 +165,7 @@ extern const SSL_METHOD *TLSv1_2_method(void);
 # define HAVE_SNI 0
 #endif
 
-#ifdef TLSEXT_TYPE_application_layer_protocol_negotiation
 # define HAVE_ALPN 1
-#else
-# define HAVE_ALPN 0
-#endif
 
 /* NPN replaced by ALPN (which is supported since 1.0.2) */
 # define HAVE_NPN 0
@@ -399,10 +395,8 @@ static unsigned int _ssl_locks_count = 0;
 typedef struct {
     PyObject_HEAD
     SSL_CTX *ctx;
-#if HAVE_ALPN
     unsigned char *alpn_protocols;
     unsigned int alpn_protocols_len;
-#endif
 #ifndef OPENSSL_NO_TLSEXT
     PyObject *set_sni_cb;
 #endif
@@ -2104,7 +2098,6 @@ _ssl__SSLSocket_version_impl(PySSLSocket *self)
     return PyUnicode_FromString(version);
 }
 
-#if HAVE_ALPN
 /*[clinic input]
 _ssl._SSLSocket.selected_alpn_protocol
 [clinic start generated code]*/
@@ -2122,7 +2115,6 @@ _ssl__SSLSocket_selected_alpn_protocol_impl(PySSLSocket *self)
         Py_RETURN_NONE;
     return PyUnicode_FromStringAndSize((char *)out, outlen);
 }
-#endif
 
 /*[clinic input]
 _ssl._SSLSocket.compression
@@ -3133,9 +3125,7 @@ _ssl__SSLContext_impl(PyTypeObject *type, int proto_version)
     self->keylog_filename = NULL;
     self->keylog_bio = NULL;
 #endif
-#if HAVE_ALPN
     self->alpn_protocols = NULL;
-#endif
 #ifndef OPENSSL_NO_TLSEXT
     self->set_sni_cb = NULL;
 #endif
@@ -3289,9 +3279,7 @@ context_dealloc(PySSLContext *self)
     PyObject_GC_UnTrack(self);
     context_clear(self);
     SSL_CTX_free(self->ctx);
-#if HAVE_ALPN
     PyMem_FREE(self->alpn_protocols);
-#endif
     Py_TYPE(self)->tp_free(self);
 }
 
@@ -3364,7 +3352,6 @@ _ssl__SSLContext_get_ciphers_impl(PySSLContext *self)
 #endif
 
 
-#if HAVE_ALPN
 static int
 do_protocol_selection(int alpn, unsigned char **out, unsigned char *outlen,
                       const unsigned char *server_protocols, unsigned int server_protocols_len,
@@ -3388,7 +3375,6 @@ do_protocol_selection(int alpn, unsigned char **out, unsigned char *outlen,
 
     return SSL_TLSEXT_ERR_OK;
 }
-#endif
 
 /*[clinic input]
 _ssl._SSLContext._set_npn_protocols
@@ -3406,7 +3392,6 @@ _ssl__SSLContext__set_npn_protocols_impl(PySSLContext *self,
     return NULL;
 }
 
-#if HAVE_ALPN
 static int
 _selectALPN_cb(SSL *s,
               const unsigned char **out, unsigned char *outlen,
@@ -3418,7 +3403,6 @@ _selectALPN_cb(SSL *s,
                                  ctx->alpn_protocols, ctx->alpn_protocols_len,
                                  client_protocols, client_protocols_len);
 }
-#endif
 
 /*[clinic input]
 _ssl._SSLContext._set_alpn_protocols
@@ -3431,7 +3415,6 @@ _ssl__SSLContext__set_alpn_protocols_impl(PySSLContext *self,
                                           Py_buffer *protos)
 /*[clinic end generated code: output=87599a7f76651a9b input=9bba964595d519be]*/
 {
-#if HAVE_ALPN
     if ((size_t)protos->len > UINT_MAX) {
         PyErr_Format(PyExc_OverflowError,
             "protocols longer than %u bytes", UINT_MAX);
@@ -3450,11 +3433,6 @@ _ssl__SSLContext__set_alpn_protocols_impl(PySSLContext *self,
     SSL_CTX_set_alpn_select_cb(self->ctx, _selectALPN_cb, self);
 
     Py_RETURN_NONE;
-#else
-    PyErr_SetString(PyExc_NotImplementedError,
-                    "The ALPN extension requires OpenSSL 1.0.2 or later.");
-    return NULL;
-#endif
 }
 
 static PyObject *
@@ -6233,11 +6211,7 @@ PyInit__ssl(void)
 
 addbool(m, "HAS_NPN", 0);
 
-#if HAVE_ALPN
-    addbool(m, "HAS_ALPN", 1);
-#else
-    addbool(m, "HAS_ALPN", 0);
-#endif
+addbool(m, "HAS_ALPN", 1);
 
 #if defined(SSL2_VERSION) && !defined(OPENSSL_NO_SSL2)
     addbool(m, "HAS_SSLv2", 1);
