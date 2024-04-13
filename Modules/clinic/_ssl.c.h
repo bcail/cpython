@@ -132,29 +132,6 @@ _ssl__SSLSocket_version(PySSLSocket *self, PyObject *Py_UNUSED(ignored))
     return _ssl__SSLSocket_version_impl(self);
 }
 
-#if (HAVE_NPN)
-
-PyDoc_STRVAR(_ssl__SSLSocket_selected_npn_protocol__doc__,
-"selected_npn_protocol($self, /)\n"
-"--\n"
-"\n");
-
-#define _SSL__SSLSOCKET_SELECTED_NPN_PROTOCOL_METHODDEF    \
-    {"selected_npn_protocol", (PyCFunction)_ssl__SSLSocket_selected_npn_protocol, METH_NOARGS, _ssl__SSLSocket_selected_npn_protocol__doc__},
-
-static PyObject *
-_ssl__SSLSocket_selected_npn_protocol_impl(PySSLSocket *self);
-
-static PyObject *
-_ssl__SSLSocket_selected_npn_protocol(PySSLSocket *self, PyObject *Py_UNUSED(ignored))
-{
-    return _ssl__SSLSocket_selected_npn_protocol_impl(self);
-}
-
-#endif /* (HAVE_NPN) */
-
-#if (HAVE_ALPN)
-
 PyDoc_STRVAR(_ssl__SSLSocket_selected_alpn_protocol__doc__,
 "selected_alpn_protocol($self, /)\n"
 "--\n"
@@ -171,8 +148,6 @@ _ssl__SSLSocket_selected_alpn_protocol(PySSLSocket *self, PyObject *Py_UNUSED(ig
 {
     return _ssl__SSLSocket_selected_alpn_protocol_impl(self);
 }
-
-#endif /* (HAVE_ALPN) */
 
 PyDoc_STRVAR(_ssl__SSLSocket_compression__doc__,
 "compression($self, /)\n"
@@ -1166,14 +1141,6 @@ exit:
 
 #endif /* defined(_MSC_VER) */
 
-#ifndef _SSL__SSLSOCKET_SELECTED_NPN_PROTOCOL_METHODDEF
-    #define _SSL__SSLSOCKET_SELECTED_NPN_PROTOCOL_METHODDEF
-#endif /* !defined(_SSL__SSLSOCKET_SELECTED_NPN_PROTOCOL_METHODDEF) */
-
-#ifndef _SSL__SSLSOCKET_SELECTED_ALPN_PROTOCOL_METHODDEF
-    #define _SSL__SSLSOCKET_SELECTED_ALPN_PROTOCOL_METHODDEF
-#endif /* !defined(_SSL__SSLSOCKET_SELECTED_ALPN_PROTOCOL_METHODDEF) */
-
 #ifndef _SSL__SSLCONTEXT_GET_CIPHERS_METHODDEF
     #define _SSL__SSLCONTEXT_GET_CIPHERS_METHODDEF
 #endif /* !defined(_SSL__SSLCONTEXT_GET_CIPHERS_METHODDEF) */
@@ -1193,4 +1160,4 @@ exit:
 #ifndef _SSL_ENUM_CRLS_METHODDEF
     #define _SSL_ENUM_CRLS_METHODDEF
 #endif /* !defined(_SSL_ENUM_CRLS_METHODDEF) */
-/*[clinic end generated code: output=c4e73b70ac3618ba input=a9049054013a1b77]*/
+/*[clinic end generated code: output=b97fdc65800b5e1b input=a9049054013a1b77]*/
