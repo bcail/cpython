@@ -128,11 +128,11 @@ static void _PySSLFixErrno(void) {
 /* Include generated data (error codes) */
 #if (OPENSSL_VERSION_NUMBER >= 0x30000000L)
 #include "_ssl_data_300.h"
-#elif !defined(LIBRESSL_VERSION_NUMBER)
+#else
 #include "_ssl_data_111.h"
 #endif
 
-#if (OPENSSL_VERSION_NUMBER >= 0x10100000L) && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L)
 #  define OPENSSL_VERSION_1_1 1
 #  define PY_OPENSSL_1_1_API 1
 #endif
@@ -151,11 +151,6 @@ extern const SSL_METHOD *TLSv1_1_method(void);
 extern const SSL_METHOD *TLSv1_2_method(void);
 #endif
 
-/* LibreSSL 2.7.0 provides necessary OpenSSL 1.1.0 APIs */
-#if defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER >= 0x2070000fL
-#  define PY_OPENSSL_1_1_API 1
-#endif
-
 /* SNI support (client- and server-side) appeared in OpenSSL 1.0.0 and 0.9.8f
  * This includes the SSL_set_SSL_CTX() function.
  */
@@ -170,7 +165,7 @@ extern const SSL_METHOD *TLSv1_2_method(void);
 /* NPN replaced by ALPN (which is supported since 1.0.2) */
 # define HAVE_NPN 0
 
-#if (OPENSSL_VERSION_NUMBER >= 0x10101000L) && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10101000L)
 #define HAVE_OPENSSL_KEYLOG 1
 #endif
 
@@ -183,7 +178,7 @@ extern const SSL_METHOD *TLSv1_2_method(void);
 #endif
 
 #ifndef PY_OPENSSL_1_1_API
-/* OpenSSL 1.1 API shims for OpenSSL < 1.1.0 and LibreSSL < 2.7.0 */
+/* OpenSSL 1.1 API shims for OpenSSL < 1.1.0 */
 
 #define TLS_method SSLv23_method
 #define TLS_client_method SSLv23_client_method
@@ -251,7 +246,7 @@ SSL_SESSION_get_ticket_lifetime_hint(const SSL_SESSION *s)
     return s->tlsext_tick_lifetime_hint;
 }
 
-#endif /* OpenSSL < 1.1.0 or LibreSSL < 2.7.0 */
+#endif /* OpenSSL < 1.1.0 */
 
 /* Default cipher suites */
 #ifndef PY_SSL_DEFAULT_CIPHERS
@@ -612,7 +607,7 @@ fill_and_set_sslerror(PySSLSocket *sslsock, PyObject *type, int ssl_errno,
 
         switch (verify_code) {
 #ifdef X509_V_ERR_HOSTNAME_MISMATCH
-        /* OpenSSL >= 1.0.2, LibreSSL >= 2.5.3 */
+        /* OpenSSL >= 1.0.2 */
         case X509_V_ERR_HOSTNAME_MISMATCH:
             verify_obj = PyUnicode_FromFormat(
                 "Hostname mismatch, certificate is not valid for '%S'.",
@@ -929,7 +924,7 @@ newPySSLSocket(PySSLContext *sslctx, PySocketSockObject *sock,
         return NULL;
     }
     /* bpo43522 and OpenSSL < 1.1.1l: copy hostflags manually */
-#if !defined(LIBRESSL_VERSION_NUMBER) && OPENSSL_VERSION < 0x101010cf
+#if OPENSSL_VERSION < 0x101010cf
     X509_VERIFY_PARAM *ssl_params = SSL_get0_param(self->ssl);
     X509_VERIFY_PARAM_set_hostflags(ssl_params, sslctx->hostflags);
 #endif
@@ -3597,7 +3592,7 @@ set_maximum_version(PySSLContext *self, PyObject *arg, void *c)
 }
 #endif /* SSL_CTRL_GET_MAX_PROTO_VERSION */
 
-#if (OPENSSL_VERSION_NUMBER >= 0x10101000L) && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10101000L)
 static PyObject *
 get_num_tickets(PySSLContext *self, void *c)
 {
@@ -4659,7 +4654,7 @@ static PyGetSetDef context_getsetlist[] = {
                       (setter) _PySSLContext_set_msg_callback, NULL},
     {"sni_callback", (getter) get_sni_callback,
                      (setter) set_sni_callback, PySSLContext_sni_callback_doc},
-#if (OPENSSL_VERSION_NUMBER >= 0x10101000L) && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10101000L)
     {"num_tickets", (getter) get_num_tickets,
                     (setter) set_num_tickets, PySSLContext_num_tickets_doc},
 #endif
