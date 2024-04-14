@@ -235,9 +235,7 @@ enum py_proto_version {
  * available version, and the other way around. We have to figure out the
  * minimum and maximum available version on our own and hope for the best.
  */
-#if defined(SSL3_VERSION) && !defined(OPENSSL_NO_SSL3)
-    PY_PROTO_MINIMUM_AVAILABLE = PY_PROTO_SSLv3,
-#elif defined(TLS1_VERSION) && !defined(OPENSSL_NO_TLS1)
+#if defined(TLS1_VERSION) && !defined(OPENSSL_NO_TLS1)
     PY_PROTO_MINIMUM_AVAILABLE = PY_PROTO_TLSv1,
 #elif defined(TLS1_1_VERSION) && !defined(OPENSSL_NO_TLS1_1)
     PY_PROTO_MINIMUM_AVAILABLE = PY_PROTO_TLSv1_1,
@@ -257,8 +255,6 @@ enum py_proto_version {
     PY_PROTO_MAXIMUM_AVAILABLE = PY_PROTO_TLSv1_1,
 #elif defined(TLS1_VERSION) && !defined(OPENSSL_NO_TLS1)
     PY_PROTO_MAXIMUM_AVAILABLE = PY_PROTO_TLSv1,
-#elif defined(SSL3_VERSION) && !defined(OPENSSL_NO_SSL3)
-    PY_PROTO_MAXIMUM_AVAILABLE = PY_PROTO_SSLv3,
 #else
     #error "PY_PROTO_MAXIMUM_AVAILABLE not found"
 #endif
@@ -2919,11 +2915,6 @@ _ssl__SSLContext_impl(PyTypeObject *type, int proto_version)
 
     PySSL_BEGIN_ALLOW_THREADS
     switch(proto_version) {
-#if defined(SSL3_VERSION) && !defined(OPENSSL_NO_SSL3)
-    case PY_SSL_VERSION_SSL3:
-        ctx = SSL_CTX_new(SSLv3_method());
-        break;
-#endif
 #if (defined(TLS1_VERSION) && \
         !defined(OPENSSL_NO_TLS1) && \
         !defined(OPENSSL_NO_TLS1_METHOD))
@@ -5824,14 +5815,6 @@ PyInit__ssl(void)
 #undef ADD_AD_CONSTANT
 
     /* protocol versions */
-#ifndef OPENSSL_NO_SSL2
-    PyModule_AddIntConstant(m, "PROTOCOL_SSLv2",
-                            PY_SSL_VERSION_SSL2);
-#endif
-#ifndef OPENSSL_NO_SSL3
-    PyModule_AddIntConstant(m, "PROTOCOL_SSLv3",
-                            PY_SSL_VERSION_SSL3);
-#endif
     PyModule_AddIntConstant(m, "PROTOCOL_SSLv23",
                             PY_SSL_VERSION_TLS);
     PyModule_AddIntConstant(m, "PROTOCOL_TLS",
@@ -5938,17 +5921,9 @@ addbool(m, "HAS_NPN", 0);
 
 addbool(m, "HAS_ALPN", 1);
 
-#if defined(SSL2_VERSION) && !defined(OPENSSL_NO_SSL2)
-    addbool(m, "HAS_SSLv2", 1);
-#else
-    addbool(m, "HAS_SSLv2", 0);
-#endif
+addbool(m, "HAS_SSLv2", 0);
 
-#if defined(SSL3_VERSION) && !defined(OPENSSL_NO_SSL3)
-    addbool(m, "HAS_SSLv3", 1);
-#else
-    addbool(m, "HAS_SSLv3", 0);
-#endif
+addbool(m, "HAS_SSLv3", 0);
 
 #if defined(TLS1_VERSION) && !defined(OPENSSL_NO_TLS1)
     addbool(m, "HAS_TLSv1", 1);
