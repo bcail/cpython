@@ -146,9 +146,7 @@ extern const SSL_METHOD *TLSv1_1_method(void);
 extern const SSL_METHOD *TLSv1_2_method(void);
 #endif
 
-#if (OPENSSL_VERSION_NUMBER >= 0x10101000L)
 #define HAVE_OPENSSL_KEYLOG 1
-#endif
 
 #ifndef INVALID_SOCKET /* MS defines this */
 #define INVALID_SOCKET (-1)
@@ -303,10 +301,8 @@ typedef struct {
     int post_handshake_auth;
 #endif
     PyObject *msg_cb;
-#ifdef HAVE_OPENSSL_KEYLOG
     PyObject *keylog_filename;
     BIO *keylog_bio;
-#endif
 } PySSLContext;
 
 typedef struct {
@@ -2984,10 +2980,8 @@ _ssl__SSLContext_impl(PyTypeObject *type, int proto_version)
     self->hostflags = X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS;
     self->protocol = proto_version;
     self->msg_cb = NULL;
-#ifdef HAVE_OPENSSL_KEYLOG
     self->keylog_filename = NULL;
     self->keylog_bio = NULL;
-#endif
     self->alpn_protocols = NULL;
 #ifndef OPENSSL_NO_TLSEXT
     self->set_sni_cb = NULL;
@@ -3107,7 +3101,6 @@ context_clear(PySSLContext *self)
     Py_CLEAR(self->set_sni_cb);
 #endif
     Py_CLEAR(self->msg_cb);
-#ifdef HAVE_OPENSSL_KEYLOG
     Py_CLEAR(self->keylog_filename);
     if (self->keylog_bio != NULL) {
         PySSL_BEGIN_ALLOW_THREADS
@@ -3115,7 +3108,6 @@ context_clear(PySSLContext *self)
         PySSL_END_ALLOW_THREADS
         self->keylog_bio = NULL;
     }
-#endif
     return 0;
 }
 
@@ -4508,10 +4500,8 @@ static PyGetSetDef context_getsetlist[] = {
     {"maximum_version", (getter) get_maximum_version,
                         (setter) set_maximum_version, NULL},
 #endif
-#ifdef HAVE_OPENSSL_KEYLOG
     {"keylog_filename", (getter) _PySSLContext_get_keylog_filename,
                         (setter) _PySSLContext_set_keylog_filename, NULL},
-#endif
     {"_msg_callback", (getter) _PySSLContext_get_msg_callback,
                       (setter) _PySSLContext_set_msg_callback, NULL},
     {"sni_callback", (getter) get_sni_callback,
