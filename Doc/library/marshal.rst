@@ -16,11 +16,10 @@ rarely does). [#]_
 
 .. index::
    module: pickle
-   module: shelve
 
 This is not a general "persistence" module.  For general persistence and
-transfer of Python objects through RPC calls, see the modules :mod:`pickle` and
-:mod:`shelve`.  The :mod:`marshal` module exists mainly to support reading and
+transfer of Python objects through RPC calls, see the module :mod:`pickle`.
+The :mod:`marshal` module exists mainly to support reading and
 writing the "pseudo-compiled" code for Python modules of :file:`.pyc` files.
 Therefore, the Python maintainers reserve the right to modify the marshal format
 in backward incompatible ways should the need arise.  If you're serializing and

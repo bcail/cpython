@@ -17,7 +17,6 @@ The list of modules described in this chapter is:
 
    pickle.rst
    copyreg.rst
-   shelve.rst
    marshal.rst
    dbm.rst
    sqlite3.rst

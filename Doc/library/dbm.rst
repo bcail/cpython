@@ -112,12 +112,6 @@ then prints out the contents of the database::
    # db is automatically closed when leaving the with statement.
 
 
-.. seealso::
-
-   Module :mod:`shelve`
-      Persistence module which stores non-string data.
-
-
 The individual submodules are described in the following sections.
 
 
@@ -366,8 +360,7 @@ The module defines the following:
 
    .. method:: dumbdbm.sync()
 
-      Synchronize the on-disk directory and data files.  This method is called
-      by the :meth:`Shelve.sync` method.
+      Synchronize the on-disk directory and data files.
 
    .. method:: dumbdbm.close()
 

@@ -1351,7 +1351,7 @@ by Serhiy Storchaka in :issue:`16488`.)
 shelve
 ------
 
-:class:`~shelve.Shelf` instances may now be used in :keyword:`with` statements,
+:class:`!~shelve.Shelf` instances may now be used in :keyword:`with` statements,
 and will be automatically closed at the end of the :keyword:`!with` block.
 (Contributed by Filip Gruszczyński in :issue:`13896`.)
 

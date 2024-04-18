@@ -805,9 +805,7 @@ How do you implement persistent objects in Python?
 --------------------------------------------------
 
 The :mod:`pickle` library module solves this in a very general way (though you
-still can't store things like open files, sockets or windows), and the
-:mod:`shelve` library module uses pickle and (g)dbm to create persistent
-mappings containing arbitrary Python objects.
+still can't store things like open files, sockets or windows).
 
 
 Mathematics and Numerics

@@ -154,9 +154,7 @@ to read the pickle produced.
    object into a byte stream and it can transform the byte stream into an object
    with the same internal structure.  Perhaps the most obvious thing to do with
    these byte streams is to write them onto a file, but it is also conceivable to
-   send them across a network or store them in a database.  The :mod:`shelve`
-   module provides a simple interface to pickle and unpickle objects on
-   DBM-style database files.
+   send them across a network or store them in a database.
 
 
 Module Interface
@@ -909,9 +907,6 @@ The following example reads the resulting pickled data. ::
 
    Module :mod:`pickletools`
       Tools for working with and analyzing pickled data.
-
-   Module :mod:`shelve`
-      Indexed databases of objects; uses :mod:`pickle`.
 
    Module :mod:`copy`
       Shallow and deep object copying.

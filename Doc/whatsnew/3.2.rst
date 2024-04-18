@@ -454,15 +454,10 @@ Some smaller changes made to the core Python language are:
   capabilities of the existing :meth:`str.format` method by accepting arbitrary
   :term:`mapping` objects.  This new method makes it possible to use string
   formatting with any of Python's many dictionary-like objects such as
-  :class:`~collections.defaultdict`, :class:`~shelve.Shelf`,
-  :class:`~configparser.ConfigParser`, or :mod:`dbm`.  It is also useful with
-  custom :class:`dict` subclasses that normalize keys before look-up or that
-  supply a :meth:`__missing__` method for unknown keys::
-
-    >>> import shelve
-    >>> d = shelve.open('tmp.shl')
-    >>> 'The {project_name} status is {status} as of {date}'.format_map(d)
-    'The testing project status is green as of February 15, 2011'
+  :class:`~collections.defaultdict`, :class:`~configparser.ConfigParser`,
+  or :mod:`dbm`.  It is also useful with custom :class:`dict` subclasses that
+  normalize keys before look-up or that supply a :meth:`__missing__` method for
+  unknown keys::
 
     >>> class LowerCasedDict(dict):
     ...     def __getitem__(self, key):

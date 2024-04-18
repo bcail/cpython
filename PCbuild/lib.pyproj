@@ -622,7 +622,6 @@
     <Compile Include="sched.py" />
     <Compile Include="secrets.py" />
     <Compile Include="selectors.py" />
-    <Compile Include="shelve.py" />
     <Compile Include="shlex.py" />
     <Compile Include="shutil.py" />
     <Compile Include="signal.py" />
@@ -1157,7 +1156,6 @@
     <Compile Include="test\test_selectors.py" />
     <Compile Include="test\test_set.py" />
     <Compile Include="test\test_setcomps.py" />
-    <Compile Include="test\test_shelve.py" />
     <Compile Include="test\test_shlex.py" />
     <Compile Include="test\test_shutil.py" />
     <Compile Include="test\test_signal.py" />

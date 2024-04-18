@@ -1592,7 +1592,7 @@ complete list of changes, or look through the CVS logs for all the details.
 * The :mod:`UserDict` module has a new :class:`DictMixin` class which defines
   all dictionary methods for classes that already have a minimum mapping
   interface.  This greatly simplifies writing classes that need to be
-  substitutable for dictionaries, such as the classes in  the :mod:`shelve`
+  substitutable for dictionaries, such as the classes in  the :mod:`!shelve`
   module.
 
   Adding the mix-in as a superclass provides the full dictionary interface
