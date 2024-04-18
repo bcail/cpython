@@ -455,7 +455,7 @@ Some smaller changes made to the core Python language are:
   :term:`mapping` objects.  This new method makes it possible to use string
   formatting with any of Python's many dictionary-like objects such as
   :class:`~collections.defaultdict`, :class:`~configparser.ConfigParser`,
-  or :mod:`dbm`.  It is also useful with custom :class:`dict` subclasses that
+  or :mod:`!dbm`.  It is also useful with custom :class:`dict` subclasses that
   normalize keys before look-up or that supply a :meth:`__missing__` method for
   unknown keys::
 

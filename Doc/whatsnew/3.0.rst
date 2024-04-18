@@ -603,8 +603,8 @@ review:
   the submodule names have been simplified.  The resulting new
   packages are:
 
-  * :mod:`dbm` (:mod:`anydbm`, :mod:`dbhash`, :mod:`dbm`,
-    :mod:`dumbdbm`, :mod:`gdbm`, :mod:`whichdb`).
+  * :mod:`!dbm` (:mod:`!anydbm`, :mod:`dbhash`, :mod:`!dbm`,
+    :mod:`!dumbdbm`, :mod:`!gdbm`, :mod:`whichdb`).
 
   * :mod:`html` (:mod:`HTMLParser`, :mod:`htmlentitydefs`).
 

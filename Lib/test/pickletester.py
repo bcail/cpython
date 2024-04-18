@@ -1,6 +1,5 @@
 import collections
 import copyreg
-import dbm
 import io
 import functools
 import os
@@ -981,9 +980,6 @@ class AbstractUnpickleTests(unittest.TestCase):
         # reduce
         pickled = b'\x80\x02c__builtin__\nreduce\n.'
         self.assertIs(self.loads(pickled), functools.reduce)
-        # whichdb.whichdb
-        pickled = b'\x80\x02cwhichdb\nwhichdb\n.'
-        self.assertIs(self.loads(pickled), dbm.whichdb)
         # Exception(), StandardError()
         for name in (b'Exception', b'StandardError'):
             pickled = (b'\x80\x02cexceptions\n' + name + b'\nU\x03ugh\x85R.')
@@ -2436,7 +2432,6 @@ class AbstractPickleTests(unittest.TestCase):
             (range(1, 7), '__builtin__', 'xrange'),
             (map(int, '123'), 'itertools', 'imap'),
             (functools.reduce, '__builtin__', 'reduce'),
-            (dbm.whichdb, 'whichdb', 'whichdb'),
             (Exception(), 'exceptions', 'Exception'),
             (collections.UserDict(), 'UserDict', 'IterableUserDict'),
             (collections.UserList(), 'UserList', 'UserList'),
