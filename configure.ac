@@ -3068,24 +3068,6 @@ else
   TCLTK_LIBS="$with_tcltk_libs"
 fi
 
-# Check for --with-dbmliborder
-AC_MSG_CHECKING(for --with-dbmliborder)
-AC_ARG_WITH(dbmliborder,
-            AS_HELP_STRING([--with-dbmliborder=db1:db2:...], [order to check db backends for dbm. Valid value is a colon separated string with the backend names `ndbm', `gdbm' and `bdb'.]),
-[
-if test x$with_dbmliborder = xyes
-then
-AC_MSG_ERROR([proper usage is --with-dbmliborder=db1:db2:...])
-else
-  for db in `echo $with_dbmliborder | sed 's/:/ /g'`; do
-    if test x$db != xndbm && test x$db != xgdbm && test x$db != xbdb
-    then
-      AC_MSG_ERROR([proper usage is --with-dbmliborder=db1:db2:...])
-    fi
-  done
-fi])
-AC_MSG_RESULT($with_dbmliborder)
-
 AC_SUBST(LDLAST)
 
 # Templates for things AC_DEFINEd more than once.

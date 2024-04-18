@@ -305,20 +305,6 @@ _symtable symtablemodule.c
 #_curses_panel _curses_panel.c -lpanel -lncurses
 
 
-# Modules that provide persistent dictionary-like semantics.  You will
-# probably want to arrange for at least one of them to be available on
-# your machine, though none are defined by default because of library
-# dependencies.  The Python module dbm/__init__.py provides an
-# implementation independent wrapper for these; dbm/dumb.py provides
-# similar functionality (but slower of course) implemented in Python.
-
-#_dbm _dbmmodule.c 	# dbm(3) may require -lndbm or similar
-
-# Anthony Baxter's gdbm module.  GNU dbm(3) will require -lgdbm:
-
-#_gdbm _gdbmmodule.c -I/usr/local/include -L/usr/local/lib -lgdbm
-
-
 # Helper module for various ascii-encoders
 #binascii binascii.c
 

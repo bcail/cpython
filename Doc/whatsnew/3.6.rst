@@ -1975,7 +1975,7 @@ The :mod:`asyncore` has been deprecated in favor of :mod:`asyncio`.
 dbm
 ~~~
 
-Unlike other :mod:`dbm` implementations, the :mod:`dbm.dumb` module
+Unlike other :mod:`!dbm` implementations, the :mod:`!dbm.dumb` module
 creates databases with the ``'rw'`` mode and allows modifying the database
 opened with the ``'r'`` mode.  This behavior is now deprecated and will
 be removed in 3.8.

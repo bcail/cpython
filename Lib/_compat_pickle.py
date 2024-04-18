@@ -29,10 +29,6 @@ IMPORT_MAPPING = {
     '_winreg': 'winreg',
     'thread': '_thread',
     'dummy_thread': '_dummy_thread',
-    'dbhash': 'dbm.bsd',
-    'dumbdbm': 'dbm.dumb',
-    'dbm': 'dbm.ndbm',
-    'gdbm': 'dbm.gnu',
     'xmlrpclib': 'xmlrpc.client',
     'SimpleXMLRPCServer': 'xmlrpc.server',
     'httplib': 'http.client',
@@ -46,7 +42,6 @@ IMPORT_MAPPING = {
     'urlparse' : 'urllib.parse',
     'robotparser' : 'urllib.robotparser',
     'urllib2': 'urllib.request',
-    'anydbm': 'dbm',
     '_abcoll' : 'collections.abc',
 }
 
@@ -69,7 +64,6 @@ NAME_MAPPING = {
     ('UserDict', 'IterableUserDict'): ('collections', 'UserDict'),
     ('UserList', 'UserList'): ('collections', 'UserList'),
     ('UserString', 'UserString'): ('collections', 'UserString'),
-    ('whichdb', 'whichdb'): ('dbm', 'whichdb'),
     ('_socket', 'fromfd'): ('socket', 'fromfd'),
     ('_multiprocessing', 'Connection'): ('multiprocessing.connection', 'Connection'),
     ('multiprocessing.process', 'Process'): ('multiprocessing.context', 'Process'),
@@ -181,16 +175,13 @@ IMPORT_MAPPING.update({
     'UserDict': 'collections',
     'UserList': 'collections',
     'UserString': 'collections',
-    'whichdb': 'dbm',
     'StringIO':  'io',
     'cStringIO': 'io',
 })
 
 REVERSE_IMPORT_MAPPING.update({
     '_bz2': 'bz2',
-    '_dbm': 'dbm',
     '_functools': 'functools',
-    '_gdbm': 'gdbm',
     '_pickle': 'pickle',
 })
 

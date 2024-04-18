@@ -791,10 +791,8 @@ Are there any interfaces to database packages in Python?
 
 Yes.
 
-Interfaces to disk-based hashes such as :mod:`DBM <dbm.ndbm>` and :mod:`GDBM
-<dbm.gnu>` are also included with standard Python.  There is also the
-:mod:`sqlite3` module, which provides a lightweight disk-based relational
-database.
+There is also the :mod:`sqlite3` module, which provides a lightweight
+disk-based relational database.
 
 Support for most relational databases is available.  See the
 `DatabaseProgramming wiki page

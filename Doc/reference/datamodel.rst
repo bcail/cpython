@@ -428,14 +428,6 @@ Mappings
       Dictionaries are mutable; they can be created by the ``{...}`` notation (see
       section :ref:`dict`).
 
-      .. index::
-         module: dbm.ndbm
-         module: dbm.gnu
-
-      The extension modules :mod:`dbm.ndbm` and :mod:`dbm.gnu` provide
-      additional examples of mapping types, as does the :mod:`collections`
-      module.
-
       .. versionchanged:: 3.7
          Dictionaries did not preserve insertion order in versions of Python before 3.6.
          In CPython 3.6, insertion order was preserved, but it was considered

@@ -1053,7 +1053,7 @@ manual screen resizing.  (Contributed by Arnon Yaari in :issue:`4254`.)
 dbm
 ---
 
-:func:`dumb.open <dbm.dumb.open>` always creates a new database when the flag
+:func:`!dumb.open <dbm.dumb.open>` always creates a new database when the flag
 has the value ``"n"``.  (Contributed by Claudiu Popa in :issue:`18039`.)
 
 

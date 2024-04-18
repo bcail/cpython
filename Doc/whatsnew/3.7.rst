@@ -869,7 +869,7 @@ The :class:`tzinfo <datetime.tzinfo>` class now supports sub-minute offsets.
 dbm
 ---
 
-:mod:`dbm.dumb` now supports reading read-only files and no longer writes the
+:mod:`!dbm.dumb` now supports reading read-only files and no longer writes the
 index file when it is not changed.
 
 
@@ -1985,7 +1985,7 @@ base classes.
 dbm
 ---
 
-:mod:`dbm.dumb` now supports reading read-only files and no longer writes the
+:mod:`!dbm.dumb` now supports reading read-only files and no longer writes the
 index file when it is not changed.  A deprecation warning is now emitted
 if the index file is missing and recreated in the ``'r'`` and ``'w'``
 modes (this will be an error in future Python releases).

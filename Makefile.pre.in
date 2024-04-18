@@ -1332,7 +1332,7 @@ LIBSUBDIRS=	tkinter tkinter/test tkinter/test/test_tkinter \
 		collections concurrent concurrent/futures encodings \
 		email email/mime test/test_email test/test_email/data \
 		ensurepip ensurepip/_bundled \
-		html json test/test_json http dbm xmlrpc \
+		html json test/test_json http xmlrpc \
 		sqlite3 sqlite3/test \
 		logging csv wsgiref urllib \
 		ctypes ctypes/test ctypes/macholib \

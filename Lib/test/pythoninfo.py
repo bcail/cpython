@@ -626,15 +626,6 @@ def collect_cc(info_add):
     info_add('CC.version', text)
 
 
-def collect_gdbm(info_add):
-    try:
-        from _gdbm import _GDBM_VERSION
-    except ImportError:
-        return
-
-    info_add('gdbm.GDBM_VERSION', '.'.join(map(str, _GDBM_VERSION)))
-
-
 def collect_get_config(info_add):
     # Dump global configuration variables, _PyCoreConfig
     # and _PyMainInterpreterConfig
@@ -682,7 +673,6 @@ def collect_info(info):
         collect_testcapi,
         collect_resource,
         collect_cc,
-        collect_gdbm,
         collect_get_config,
         collect_subprocess,
 

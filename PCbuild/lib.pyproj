@@ -146,10 +146,6 @@
     <Compile Include="curses\textpad.py" />
     <Compile Include="curses\__init__.py" />
     <Compile Include="datetime.py" />
-    <Compile Include="dbm\dumb.py" />
-    <Compile Include="dbm\gnu.py" />
-    <Compile Include="dbm\ndbm.py" />
-    <Compile Include="dbm\__init__.py" />
     <Compile Include="decimal.py" />
     <Compile Include="difflib.py" />
     <Compile Include="dis.py" />
@@ -852,10 +848,6 @@
     <Compile Include="test\test_ctypes.py" />
     <Compile Include="test\test_curses.py" />
     <Compile Include="test\test_datetime.py" />
-    <Compile Include="test\test_dbm.py" />
-    <Compile Include="test\test_dbm_dumb.py" />
-    <Compile Include="test\test_dbm_gnu.py" />
-    <Compile Include="test\test_dbm_ndbm.py" />
     <Compile Include="test\test_decimal.py" />
     <Compile Include="test\test_decorators.py" />
     <Compile Include="test\test_defaultdict.py" />
@@ -1609,7 +1601,6 @@
     <Folder Include="ctypes\macholib" />
     <Folder Include="ctypes\test" />
     <Folder Include="curses" />
-    <Folder Include="dbm" />
     <Folder Include="distutils" />
     <Folder Include="distutils\command" />
     <Folder Include="distutils\tests" />
