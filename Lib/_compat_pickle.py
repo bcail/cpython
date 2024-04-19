@@ -64,7 +64,6 @@ NAME_MAPPING = {
     ('UserDict', 'IterableUserDict'): ('collections', 'UserDict'),
     ('UserList', 'UserList'): ('collections', 'UserList'),
     ('UserString', 'UserString'): ('collections', 'UserString'),
-    ('whichdb', 'whichdb'): ('whichdb'),
     ('_socket', 'fromfd'): ('socket', 'fromfd'),
     ('_multiprocessing', 'Connection'): ('multiprocessing.connection', 'Connection'),
     ('multiprocessing.process', 'Process'): ('multiprocessing.context', 'Process'),
