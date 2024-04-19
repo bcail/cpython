@@ -19,4 +19,3 @@ discretion of the installation.  Here's an overview:
    colorsys.rst
    imghdr.rst
    sndhdr.rst
-   ossaudiodev.rst

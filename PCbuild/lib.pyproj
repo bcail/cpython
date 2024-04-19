@@ -1093,7 +1093,6 @@
     <Compile Include="test\test_optparse.py" />
     <Compile Include="test\test_ordered_dict.py" />
     <Compile Include="test\test_os.py" />
-    <Compile Include="test\test_ossaudiodev.py" />
     <Compile Include="test\test_osx_env.py" />
     <Compile Include="test\test_parser.py" />
     <Compile Include="test\test_pathlib.py" />
