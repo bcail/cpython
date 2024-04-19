@@ -13,7 +13,6 @@ discretion of the installation.  Here's an overview:
 
    audioop.rst
    aifc.rst
-   sunau.rst
    wave.rst
    chunk.rst
    colorsys.rst

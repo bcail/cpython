@@ -649,7 +649,6 @@
     <Compile Include="stringprep.py" />
     <Compile Include="struct.py" />
     <Compile Include="subprocess.py" />
-    <Compile Include="sunau.py" />
     <Compile Include="symbol.py" />
     <Compile Include="symtable.py" />
     <Compile Include="sysconfig.py" />
@@ -1177,7 +1176,6 @@
     <Compile Include="test\test_structseq.py" />
     <Compile Include="test\test_subclassinit.py" />
     <Compile Include="test\test_subprocess.py" />
-    <Compile Include="test\test_sunau.py" />
     <Compile Include="test\test_sundry.py" />
     <Compile Include="test\test_super.py" />
     <Compile Include="test\test_support.py" />
