@@ -222,14 +222,6 @@ _symtable symtablemodule.c
 
 #_posixsubprocess _posixsubprocess.c  # POSIX subprocess module helper
 
-# Multimedia modules -- off by default.
-# These don't work for 64-bit platforms!!!
-# #993173 says audioop works on 64-bit platforms, though.
-# These represent audio samples or images as strings:
-
-#audioop audioop.c	# Operations on audio samples
-
-
 # Note that the _md5 and _sha modules are normally only built if the
 # system does not have the OpenSSL libs containing an optimized version.
 

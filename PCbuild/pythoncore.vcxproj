@@ -252,7 +252,6 @@
     <ClCompile Include="..\Modules\_weakref.c" />
     <ClCompile Include="..\Modules\arraymodule.c" />
     <ClCompile Include="..\Modules\atexitmodule.c" />
-    <ClCompile Include="..\Modules\audioop.c" />
     <ClCompile Include="..\Modules\binascii.c" />
     <ClCompile Include="..\Modules\cmathmodule.c" />
     <ClCompile Include="..\Modules\_datetimemodule.c" />

@@ -781,7 +781,6 @@
     <Compile Include="test\test_asyncio\__main__.py" />
     <Compile Include="test\test_asyncore.py" />
     <Compile Include="test\test_atexit.py" />
-    <Compile Include="test\test_audioop.py" />
     <Compile Include="test\test_augassign.py" />
     <Compile Include="test\test_base64.py" />
     <Compile Include="test\test_baseexception.py" />

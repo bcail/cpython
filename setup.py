@@ -803,18 +803,6 @@ class PyBuildExt(build_ext):
         # libraries, are platform-specific, or present other surprises.
         #
 
-        # Multimedia modules
-        # These don't work for 64-bit platforms!!!
-        # These represent audio samples or images as strings:
-        #
-        # Operations on audio samples
-        # According to #993173, this one should actually work fine on
-        # 64-bit platforms.
-        #
-        # audioop needs libm for floor() in multiple functions.
-        exts.append( Extension('audioop', ['audioop.c'],
-                               libraries=['m']) )
-
         # readline
         do_readline = self.compiler.find_library_file(lib_dirs, 'readline')
         readline_termcap_library = ""
