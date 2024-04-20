@@ -624,7 +624,6 @@
     <Compile Include="site.py" />
     <Compile Include="smtpd.py" />
     <Compile Include="smtplib.py" />
-    <Compile Include="sndhdr.py" />
     <Compile Include="socket.py" />
     <Compile Include="socketserver.py" />
     <Compile Include="sqlite3\dbapi2.py" />
@@ -1154,7 +1153,6 @@
     <Compile Include="test\test_smtpd.py" />
     <Compile Include="test\test_smtplib.py" />
     <Compile Include="test\test_smtpnet.py" />
-    <Compile Include="test\test_sndhdr.py" />
     <Compile Include="test\test_socket.py" />
     <Compile Include="test\test_socketserver.py" />
     <Compile Include="test\test_sort.py" />

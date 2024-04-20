@@ -17,4 +17,3 @@ discretion of the installation.  Here's an overview:
    chunk.rst
    colorsys.rst
    imghdr.rst
-   sndhdr.rst

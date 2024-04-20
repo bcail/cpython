@@ -1714,7 +1714,7 @@ support :rfc:`6531` (SMTPUTF8).
 sndhdr
 ------
 
-The :func:`~sndhdr.what` and :func:`~sndhdr.whathdr` functions  now return
+The :func:`!~sndhdr.what` and :func:`!~sndhdr.whathdr` functions  now return
 a :func:`~collections.namedtuple`.  (Contributed by Claudiu Popa in
 :issue:`18615`.)
 
