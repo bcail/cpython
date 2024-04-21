@@ -20,7 +20,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="abc.py" />
-    <Compile Include="aifc.py" />
     <Compile Include="antigravity.py" />
     <Compile Include="argparse.py" />
     <Compile Include="ast.py" />
@@ -753,7 +752,6 @@
     <Compile Include="test\testcodec.py" />
     <Compile Include="test\test_abc.py" />
     <Compile Include="test\test_abstract_numbers.py" />
-    <Compile Include="test\test_aifc.py" />
     <Compile Include="test\test_argparse.py" />
     <Compile Include="test\test_array.py" />
     <Compile Include="test\test_asdl_parser.py" />

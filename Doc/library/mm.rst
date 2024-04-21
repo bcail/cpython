@@ -12,7 +12,6 @@ discretion of the installation.  Here's an overview:
 .. toctree::
 
    audioop.rst
-   aifc.rst
    wave.rst
    chunk.rst
    colorsys.rst
