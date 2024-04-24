@@ -13,7 +13,6 @@ of it.  Here's an overview:
 
    posix.rst
    pwd.rst
-   spwd.rst
    grp.rst
    crypt.rst
    termios.rst

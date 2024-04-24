@@ -772,12 +772,6 @@ class PyBuildExt(build_ext):
         exts.append( Extension('pwd', ['pwdmodule.c']) )
         # grp(3)
         exts.append( Extension('grp', ['grpmodule.c']) )
-        # spwd, shadow passwords
-        if (config_h_vars.get('HAVE_GETSPNAM', False) or
-                config_h_vars.get('HAVE_GETSPENT', False)):
-            exts.append( Extension('spwd', ['spwdmodule.c']) )
-        else:
-            missing.append('spwd')
 
         # select(2); not on ancient System V
         exts.append( Extension('select', ['selectmodule.c']) )
