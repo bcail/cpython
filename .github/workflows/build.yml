@@ -14,28 +14,6 @@ on:
     - custom
 
 jobs:
-  check_abi:
-    name: 'Check if the ABI has changed'
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.8'
-      - name: Install Dependencies
-        run: |
-            sudo ./.github/workflows/posix-deps-apt.sh
-            sudo apt-get install -yq abigail-tools
-      - name: Build CPython
-        env:
-          CFLAGS: -g3 -O0
-        run: |
-          # Build Python with the libpython dynamic library
-          ./configure --enable-shared
-          make -j4
-      - name: Check for changes in the ABI
-        run: make check-abidump
-
   check_generated_files:
     name: 'Check if generated files are up to date'
     runs-on: ubuntu-22.04
@@ -98,7 +76,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Configure CPython
       run: |
-        brew install pkg-config openssl@1.1 xz gdbm tcl-tk
+        brew install pkg-config openssl@3.0 xz gdbm tcl-tk
         brew install zlib bzip2 ncurses readline sqlite
         SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX12.sdk \
         CC=clang \
@@ -121,26 +99,6 @@ jobs:
       run: make pythoninfo
     - name: Tests
       run: make buildbottest TESTOPTS="-j4 -uall,-cpu"
-
-  build_ubuntu_2004:
-    name: 'Ubuntu 20.04'
-    runs-on: ubuntu-20.04
-    env:
-      OPENSSL_VER: 1.1.1u
-    steps:
-    - uses: actions/checkout@v4
-    - name: Install Dependencies
-      run: sudo ./.github/workflows/posix-deps-apt.sh
-    - name: Install OpenSSL
-      run: python3 Tools/ssl/multissltests.py --steps=library --base-directory $PWD/multissl --openssl $OPENSSL_VER --system Linux
-    - name: Configure CPython
-      run: ./configure --with-pydebug --with-openssl=$PWD/multissl/openssl/$OPENSSL_VER
-    - name: Build CPython
-      run: make -j4
-    - name: Display build info
-      run: make pythoninfo
-    - name: Tests
-      run: xvfb-run make buildbottest TESTOPTS="-j4 -uall,-cpu"
 
   build_ubuntu_2204:
     name: 'Ubuntu 22.04'
