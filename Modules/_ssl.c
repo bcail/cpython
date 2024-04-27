@@ -126,11 +126,7 @@ static void _PySSLFixErrno(void) {
 #endif
 
 /* Include generated data (error codes) */
-#if (OPENSSL_VERSION_NUMBER >= 0x30000000L)
 #include "_ssl_data_300.h"
-#else
-#include "_ssl_data_111.h"
-#endif
 
 /* OpenSSL API 1.1.0+ does not include version methods. Define the methods
  * unless OpenSSL is compiled without the methods. It's the easiest way to

@@ -35,8 +35,6 @@ from ssl import TLSVersion, _TLSContentType, _TLSMessageType
 
 PROTOCOLS = sorted(ssl._PROTOCOL_NAMES)
 HOST = support.HOST
-IS_OPENSSL_1_1_1 = ssl.OPENSSL_VERSION_INFO >= (1, 1, 1)
-IS_OPENSSL_3_0_0 = ssl.OPENSSL_VERSION_INFO >= (3, 0, 0)
 PY_SSL_DEFAULT_CIPHERS = sysconfig.get_config_var('PY_SSL_DEFAULT_CIPHERS')
 
 PROTOCOL_TO_TLS_VERSION = {}
@@ -216,7 +214,7 @@ def has_tls_version(version):
     if not getattr(ssl, f'HAS_{version.name}'):
         return False
 
-    if IS_OPENSSL_3_0_0 and version < ssl.TLSVersion.TLSv1_2:
+    if version < ssl.TLSVersion.TLSv1_2:
         # bpo43791: 3.0.0-alpha14 fails with TLSV1_ALERT_INTERNAL_ERROR
         return False
 
@@ -281,20 +279,6 @@ def utc_offset(): #NOTE: ignore issues like #1647654
     if time.daylight and time.localtime().tm_isdst > 0:
         return -time.altzone  # seconds
     return -time.timezone
-
-def asn1time(cert_time):
-    # Some versions of OpenSSL ignore seconds, see #18207
-    # 0.9.8.i
-    if ssl._OPENSSL_API_VERSION == (0, 9, 8, 9, 15):
-        fmt = "%b %d %H:%M:%S %Y GMT"
-        dt = datetime.datetime.strptime(cert_time, fmt)
-        dt = dt.replace(second=0)
-        cert_time = dt.strftime(fmt)
-        # %d adds leading zero but ASN1_TIME_print() uses leading space
-        if cert_time[4] == "0":
-            cert_time = cert_time[:4] + " " + cert_time[5:]
-
-    return cert_time
 
 needs_sni = unittest.skipUnless(ssl.HAS_SNI, "SNI support needed for this test")
 
@@ -556,12 +540,12 @@ class BasicSocketTests(unittest.TestCase):
         self.assertIsInstance(t, tuple)
         self.assertIsInstance(s, str)
         # Some sanity checks follow
-        # >= 0.9
-        self.assertGreaterEqual(n, 0x900000)
+        # >= 3.0
+        self.assertGreaterEqual(n, 0x30000000)
         # < 4.0
         self.assertLess(n, 0x40000000)
         major, minor, fix, patch, status = t
-        self.assertGreaterEqual(major, 1)
+        self.assertGreaterEqual(major, 3)
         self.assertLess(major, 4)
         self.assertGreaterEqual(minor, 0)
         self.assertLess(minor, 256)
@@ -572,14 +556,9 @@ class BasicSocketTests(unittest.TestCase):
         self.assertGreaterEqual(status, 0)
         self.assertLessEqual(status, 15)
 
-        libressl_ver = f"LibreSSL {major:d}"
-        if major >= 3:
-            # 3.x uses 0xMNN00PP0L
-            openssl_ver = f"OpenSSL {major:d}.{minor:d}.{patch:d}"
-        else:
-            openssl_ver = f"OpenSSL {major:d}.{minor:d}.{fix:d}"
+        openssl_ver = f"OpenSSL {major:d}.{minor:d}.{patch:d}"
         self.assertTrue(
-            s.startswith((openssl_ver, libressl_ver)),
+            s.startswith(openssl_ver),
             (s, t, hex(n))
         )
 
@@ -1573,8 +1552,8 @@ class ContextTests(unittest.TestCase):
                          (('organizationalUnitName', 'http://www.cacert.org'),),
                          (('commonName', 'CA Cert Signing Authority'),),
                          (('emailAddress', 'support@cacert.org'),)),
-              'notAfter': asn1time('Mar 29 12:29:49 2033 GMT'),
-              'notBefore': asn1time('Mar 30 12:29:49 2003 GMT'),
+              'notAfter': 'Mar 29 12:29:49 2033 GMT',
+              'notBefore': 'Mar 30 12:29:49 2003 GMT',
               'serialNumber': '00',
               'crlDistributionPoints': ('https://www.cacert.org/revoke.crl',),
               'subject': ((('organizationName', 'Root CA'),),
@@ -1760,7 +1739,7 @@ class ContextTests(unittest.TestCase):
         obj = ctx.wrap_bio(ssl.MemoryBIO(), ssl.MemoryBIO())
         self.assertIsInstance(obj, MySSLObject)
 
-    def test_num_tickest(self):
+    def test_num_tickets(self):
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         self.assertEqual(ctx.num_tickets, 2)
         ctx.num_tickets = 1
@@ -2793,9 +2772,6 @@ def try_protocol_combo(server_protocol, client_protocol, expect_success,
 
     min_version = PROTOCOL_TO_TLS_VERSION.get(client_protocol, None)
     if (min_version is not None
-    # SSLContext.minimum_version is only available on recent OpenSSL
-    # (setter added in OpenSSL 1.1.0, getter added in OpenSSL 1.1.1)
-    and hasattr(server_context, 'minimum_version')
     and server_protocol == ssl.PROTOCOL_TLS
     and server_context.minimum_version > min_version):
         # If OpenSSL configuration is strict and requires more recent TLS
@@ -3944,41 +3920,6 @@ class ThreadedTests(unittest.TestCase):
         if "ADH" not in parts and "EDH" not in parts and "DHE" not in parts:
             self.fail("Non-DH cipher: " + cipher[0])
 
-    @unittest.skipUnless(HAVE_SECP_CURVES, "needs secp384r1 curve support")
-    @unittest.skipIf(IS_OPENSSL_1_1_1, "TODO: Test doesn't work on 1.1.1")
-    def test_ecdh_curve(self):
-        # server secp384r1, client auto
-        client_context, server_context, hostname = testing_context()
-
-        server_context.set_ecdh_curve("secp384r1")
-        server_context.set_ciphers("ECDHE:!eNULL:!aNULL")
-        server_context.options |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
-        stats = server_params_test(client_context, server_context,
-                                   chatty=True, connectionchatty=True,
-                                   sni_name=hostname)
-
-        # server auto, client secp384r1
-        client_context, server_context, hostname = testing_context()
-        client_context.set_ecdh_curve("secp384r1")
-        server_context.set_ciphers("ECDHE:!eNULL:!aNULL")
-        server_context.options |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
-        stats = server_params_test(client_context, server_context,
-                                   chatty=True, connectionchatty=True,
-                                   sni_name=hostname)
-
-        # server / client curve mismatch
-        client_context, server_context, hostname = testing_context()
-        client_context.set_ecdh_curve("prime256v1")
-        server_context.set_ecdh_curve("secp384r1")
-        server_context.set_ciphers("ECDHE:!eNULL:!aNULL")
-        server_context.options |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
-        try:
-            server_params_test(client_context, server_context,
-                                       chatty=True, connectionchatty=True,
-                                       sni_name=hostname)
-        except ssl.SSLError:
-            self.fail("mismatch curve did not fail")
-
     def test_selected_alpn_protocol(self):
         # selected_alpn_protocol() is None unless ALPN is used.
         client_context, server_context, hostname = testing_context()
@@ -4300,7 +4241,6 @@ class ThreadedTests(unittest.TestCase):
                                  'Session refers to a different SSLContext.')
 
 
-@unittest.skipUnless(has_tls_version('TLSv1_3'), "Test needs TLS 1.3")
 class TestPostHandshakeAuth(unittest.TestCase):
     def test_pha_setter(self):
         protocols = [
@@ -4506,17 +4446,12 @@ class TestPostHandshakeAuth(unittest.TestCase):
                 self.assertEqual(s.getpeercert(), {})
 
 
-HAS_KEYLOG = hasattr(ssl.SSLContext, 'keylog_filename')
-requires_keylog = unittest.skipUnless(
-    HAS_KEYLOG, 'test requires OpenSSL 1.1.1 with keylog callback')
-
 class TestSSLDebug(unittest.TestCase):
 
     def keylog_lines(self, fname=support.TESTFN):
         with open(fname) as f:
             return len(list(f))
 
-    @requires_keylog
     def test_keylog_defaults(self):
         self.addCleanup(support.unlink, support.TESTFN)
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
@@ -4539,7 +4474,6 @@ class TestSSLDebug(unittest.TestCase):
         with self.assertRaises(TypeError):
             ctx.keylog_filename = 1
 
-    @requires_keylog
     def test_keylog_filename(self):
         self.addCleanup(support.unlink, support.TESTFN)
         client_context, server_context, hostname = testing_context()
@@ -4574,7 +4508,6 @@ class TestSSLDebug(unittest.TestCase):
         client_context.keylog_filename = None
         server_context.keylog_filename = None
 
-    @requires_keylog
     @unittest.skipIf(sys.flags.ignore_environment,
                      "test is not compatible with ignore_environment")
     def test_keylog_env(self):

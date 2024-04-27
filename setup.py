@@ -411,7 +411,7 @@ class PyBuildExt(build_ext):
                for l in (missing, self.failed, self.failed_on_import)):
             print()
             print("Could not build the ssl module!")
-            print("Python requires OpenSSL 1.1+.")
+            print("Python requires OpenSSL 3.0.")
             print()
 
     def build_extension(self, ext):
@@ -1873,7 +1873,6 @@ class PyBuildExt(build_ext):
             depends=[
                 'socketmodule.h',
                 '_ssl/debughelpers.c',
-                '_ssl_data_111.h',
                 '_ssl_data_300.h',
             ]
         )
