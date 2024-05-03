@@ -127,14 +127,7 @@ to them at run-time using the :envvar:`TCL_LIBRARY` and :envvar:`TK_LIBRARY`
 environment variables.
 
 To get truly stand-alone applications, the Tcl scripts that form the library
-have to be integrated into the application as well. One tool supporting that is
-SAM (stand-alone modules), which is part of the Tix distribution
-(http://tix.sourceforge.net/).
-
-Build Tix with SAM enabled, perform the appropriate call to
-:c:func:`Tclsam_init`, etc. inside Python's
-:file:`Modules/tkappinit.c`, and link with libtclsam and libtksam (you
-might include the Tix libraries as well).
+have to be integrated into the application as well.
 
 
 Can I have Tk events handled while waiting for I/O?

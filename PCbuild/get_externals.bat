@@ -53,7 +53,6 @@ if NOT "%IncludeSSLSrc%"=="false" set libraries=%libraries%     openssl-3.0.13
 set libraries=%libraries%                                       sqlite-3.31.1.0
 if NOT "%IncludeTkinterSrc%"=="false" set libraries=%libraries% tcl-core-8.6.9.0
 if NOT "%IncludeTkinterSrc%"=="false" set libraries=%libraries% tk-8.6.9.0
-if NOT "%IncludeTkinterSrc%"=="false" set libraries=%libraries% tix-8.4.3.6
 set libraries=%libraries%                                       xz-5.2.2
 set libraries=%libraries%                                       zlib-1.2.12
 

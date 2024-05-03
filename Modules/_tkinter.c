@@ -50,12 +50,11 @@ Copyright (C) 1994 Steen Lumholt.
 
 #include "tkinter.h"
 
-#if TK_HEX_VERSION < 0x08040200
-#error "Tk older than 8.4 not supported"
+#if TK_HEX_VERSION < 0x08060000
+#error "Tk older than 8.6 not supported"
 #endif
 
-#if TK_HEX_VERSION >= 0x08050208 && TK_HEX_VERSION < 0x08060000 || \
-    TK_HEX_VERSION >= 0x08060200
+#if TK_HEX_VERSION >= 0x08060200
 #define HAVE_LIBTOMMAMTH
 #include <tclTomMath.h>
 #endif
