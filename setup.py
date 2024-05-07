@@ -1272,9 +1272,6 @@ class PyBuildExt(build_ext):
             exts.append(Extension('_codecs_%s' % loc,
                                   ['cjkcodecs/_codecs_%s.c' % loc]))
 
-        # Stefan Krah's _decimal module
-        exts.append(self._decimal_ext())
-
         # Thomas Heller's _ctypes module
         self.detect_ctypes(inc_dirs, lib_dirs)
 
@@ -1713,125 +1710,6 @@ class PyBuildExt(build_ext):
         if sysconfig.get_config_var('HAVE_LIBDL'):
             # for dlopen, see bpo-32647
             ext.libraries.append('dl')
-
-    def _decimal_ext(self):
-        extra_compile_args = []
-        undef_macros = []
-        if '--with-system-libmpdec' in sysconfig.get_config_var("CONFIG_ARGS"):
-            include_dirs = []
-            libraries = [':libmpdec.so.2']
-            sources = ['_decimal/_decimal.c']
-            depends = ['_decimal/docstrings.h']
-        else:
-            srcdir = sysconfig.get_config_var('srcdir')
-            include_dirs = [os.path.abspath(os.path.join(srcdir,
-                                                         'Modules',
-                                                         '_decimal',
-                                                         'libmpdec'))]
-            libraries = ['m']
-            sources = [
-              '_decimal/_decimal.c',
-              '_decimal/libmpdec/basearith.c',
-              '_decimal/libmpdec/constants.c',
-              '_decimal/libmpdec/context.c',
-              '_decimal/libmpdec/convolute.c',
-              '_decimal/libmpdec/crt.c',
-              '_decimal/libmpdec/difradix2.c',
-              '_decimal/libmpdec/fnt.c',
-              '_decimal/libmpdec/fourstep.c',
-              '_decimal/libmpdec/io.c',
-              '_decimal/libmpdec/memory.c',
-              '_decimal/libmpdec/mpdecimal.c',
-              '_decimal/libmpdec/numbertheory.c',
-              '_decimal/libmpdec/sixstep.c',
-              '_decimal/libmpdec/transpose.c',
-              ]
-            depends = [
-              '_decimal/docstrings.h',
-              '_decimal/libmpdec/basearith.h',
-              '_decimal/libmpdec/bits.h',
-              '_decimal/libmpdec/constants.h',
-              '_decimal/libmpdec/convolute.h',
-              '_decimal/libmpdec/crt.h',
-              '_decimal/libmpdec/difradix2.h',
-              '_decimal/libmpdec/fnt.h',
-              '_decimal/libmpdec/fourstep.h',
-              '_decimal/libmpdec/io.h',
-              '_decimal/libmpdec/mpalloc.h',
-              '_decimal/libmpdec/mpdecimal.h',
-              '_decimal/libmpdec/numbertheory.h',
-              '_decimal/libmpdec/sixstep.h',
-              '_decimal/libmpdec/transpose.h',
-              '_decimal/libmpdec/typearith.h',
-              '_decimal/libmpdec/umodarith.h',
-              ]
-
-        config = {
-          'x64':     [('CONFIG_64','1'), ('ASM','1')],
-          'uint128': [('CONFIG_64','1'), ('ANSI','1'), ('HAVE_UINT128_T','1')],
-          'ansi64':  [('CONFIG_64','1'), ('ANSI','1')],
-          'ppro':    [('CONFIG_32','1'), ('PPRO','1'), ('ASM','1')],
-          'ansi32':  [('CONFIG_32','1'), ('ANSI','1')],
-          'ansi-legacy': [('CONFIG_32','1'), ('ANSI','1'),
-                          ('LEGACY_COMPILER','1')],
-          'universal':   [('UNIVERSAL','1')]
-        }
-
-        cc = sysconfig.get_config_var('CC')
-        sizeof_size_t = sysconfig.get_config_var('SIZEOF_SIZE_T')
-        machine = os.environ.get('PYTHON_DECIMAL_WITH_MACHINE')
-
-        if machine:
-            # Override automatic configuration to facilitate testing.
-            define_macros = config[machine]
-        elif host_platform == 'darwin':
-            # Universal here means: build with the same options Python
-            # was built with.
-            define_macros = config['universal']
-        elif sizeof_size_t == 8:
-            if sysconfig.get_config_var('HAVE_GCC_ASM_FOR_X64'):
-                define_macros = config['x64']
-            elif sysconfig.get_config_var('HAVE_GCC_UINT128_T'):
-                define_macros = config['uint128']
-            else:
-                define_macros = config['ansi64']
-        elif sizeof_size_t == 4:
-            ppro = sysconfig.get_config_var('HAVE_GCC_ASM_FOR_X87')
-            if ppro and ('gcc' in cc or 'clang' in cc) and \
-               not 'sunos' in host_platform:
-                # solaris: problems with register allocation.
-                # icc >= 11.0 works as well.
-                define_macros = config['ppro']
-                extra_compile_args.append('-Wno-unknown-pragmas')
-            else:
-                define_macros = config['ansi32']
-        else:
-            raise DistutilsError("_decimal: unsupported architecture")
-
-        # Workarounds for toolchain bugs:
-        if sysconfig.get_config_var('HAVE_IPA_PURE_CONST_BUG'):
-            # Some versions of gcc miscompile inline asm:
-            # http://gcc.gnu.org/bugzilla/show_bug.cgi?id=46491
-            # http://gcc.gnu.org/ml/gcc/2010-11/msg00366.html
-            extra_compile_args.append('-fno-ipa-pure-const')
-        if sysconfig.get_config_var('HAVE_GLIBC_MEMMOVE_BUG'):
-            # _FORTIFY_SOURCE wrappers for memmove and bcopy are incorrect:
-            # http://sourceware.org/ml/libc-alpha/2010-12/msg00009.html
-            undef_macros.append('_FORTIFY_SOURCE')
-
-        # Uncomment for extra functionality:
-        #define_macros.append(('EXTRA_FUNCTIONALITY', 1))
-        ext = Extension (
-            '_decimal',
-            include_dirs=include_dirs,
-            libraries=libraries,
-            define_macros=define_macros,
-            undef_macros=undef_macros,
-            extra_compile_args=extra_compile_args,
-            sources=sources,
-            depends=depends
-        )
-        return ext
 
     def _detect_openssl(self, inc_dirs, lib_dirs):
         config_vars = sysconfig.get_config_vars()

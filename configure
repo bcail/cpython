@@ -823,7 +823,6 @@ with_undefined_behavior_sanitizer
 with_libs
 with_system_expat
 with_system_ffi
-with_system_libmpdec
 with_decimal_contextvar
 enable_loadable_sqlite_extensions
 with_tcltk_includes
@@ -1514,8 +1513,6 @@ Optional Packages:
   --with-system-expat     build pyexpat module using an installed expat
                           library
   --with-system-ffi       build _ctypes module using an installed ffi library
-  --with-system-libmpdec  build _decimal module using an installed libmpdec
-                          library
   --with-decimal-contextvar
                           build _decimal module using a coroutine-local rather
                           than a thread-local context (default is yes)
@@ -10348,21 +10345,6 @@ else
     LIBFFI_INCLUDEDIR=""
 fi
 
-
-# Check for use of the system libmpdec library
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for --with-system-libmpdec" >&5
-$as_echo_n "checking for --with-system-libmpdec... " >&6; }
-
-# Check whether --with-system_libmpdec was given.
-if test "${with_system_libmpdec+set}" = set; then :
-  withval=$with_system_libmpdec;
-else
-  with_system_libmpdec="no"
-fi
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_system_libmpdec" >&5
-$as_echo "$with_system_libmpdec" >&6; }
 
 # Check whether _decimal should use a coroutine-local or thread-local context
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for --with-decimal-contextvar" >&5

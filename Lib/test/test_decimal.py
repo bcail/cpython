@@ -41,8 +41,8 @@ import inspect
 import threading
 
 
-C = import_fresh_module('decimal', fresh=['_decimal'])
-P = import_fresh_module('decimal', blocked=['_decimal'])
+C = None
+P = import_fresh_module('decimal')
 orig_sys_decimal = sys.modules['decimal']
 
 # fractions module must import the correct decimal module.
