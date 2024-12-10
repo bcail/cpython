@@ -138,9 +138,6 @@ static struct py_ssl_library_code library_codes[] = {
 #ifdef ERR_LIB_SSL
     {"SSL", ERR_LIB_SSL},
 #endif
-#ifdef ERR_LIB_SSL2
-    {"SSL2", ERR_LIB_SSL2},
-#endif
 #ifdef ERR_LIB_SSL23
     {"SSL23", ERR_LIB_SSL23},
 #endif

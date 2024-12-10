@@ -131,7 +131,7 @@ purposes.
    :const:`None`, this function can choose to trust the system's default
    CA certificates instead.
 
-   The settings are: :data:`PROTOCOL_TLS`, :data:`OP_NO_SSLv2`, and
+   The settings are: :data:`PROTOCOL_TLS`, and
    :data:`OP_NO_SSLv3` with high encryption cipher suites without RC4 and
    without unauthenticated cipher suites. Passing :data:`~Purpose.SERVER_AUTH`
    as *purpose* sets :data:`~SSLContext.verify_mode` to :data:`CERT_REQUIRED`
@@ -679,21 +679,6 @@ Constants
 
       Use :data:`PROTOCOL_TLS` instead.
 
-.. data:: PROTOCOL_SSLv2
-
-   Selects SSL version 2 as the channel encryption protocol.
-
-   This protocol is not available if OpenSSL is compiled with the
-   ``OPENSSL_NO_SSL2`` flag.
-
-   .. warning::
-
-      SSL version 2 is insecure.  Its use is highly discouraged.
-
-   .. deprecated:: 3.6
-
-      OpenSSL has removed support for SSLv2.
-
 .. data:: PROTOCOL_SSLv3
 
    Selects SSL version 3 as the channel encryption protocol.
@@ -751,19 +736,6 @@ Constants
    flags as OpenSSL's ``SSL_OP_ALL`` constant.
 
    .. versionadded:: 3.2
-
-.. data:: OP_NO_SSLv2
-
-   Prevents an SSLv2 connection.  This option is only applicable in
-   conjunction with :const:`PROTOCOL_TLS`.  It prevents the peers from
-   choosing SSLv2 as the protocol version.
-
-   .. versionadded:: 3.2
-
-   .. deprecated:: 3.6
-
-      SSLv2 is deprecated
-
 
 .. data:: OP_NO_SSLv3
 
@@ -838,7 +810,7 @@ Constants
 .. data:: OP_CIPHER_SERVER_PREFERENCE
 
    Use the server's cipher ordering preference, rather than the client's.
-   This option has no effect on client sockets and SSLv2 server sockets.
+   This option has no effect on client sockets.
 
    .. versionadded:: 3.3
 
@@ -933,12 +905,6 @@ Constants
    which protocols you want to support.
 
    .. versionadded:: 3.3
-
-.. data:: HAS_SSLv2
-
-   Whether the OpenSSL library has built-in support for the SSL 2.0 protocol.
-
-   .. versionadded:: 3.7
 
 .. data:: HAS_SSLv3
 
@@ -1358,8 +1324,8 @@ SSL sockets also have the following additional methods and attributes:
 
    Return the actual SSL protocol version negotiated by the connection
    as a string, or ``None`` is no secure connection is established.
-   As of this writing, possible return values include ``"SSLv2"``,
-   ``"SSLv3"``, ``"TLSv1"``, ``"TLSv1.1"`` and ``"TLSv1.2"``.
+   As of this writing, possible return values include ``"SSLv3"``,
+   ``"TLSv1"``, ``"TLSv1.1"`` and ``"TLSv1.2"``.
    Recent OpenSSL versions may define more return values.
 
    .. versionadded:: 3.5
@@ -1438,19 +1404,17 @@ to speed up repeated connections from the same clients.
 
      .. table::
 
-       ========================  ============  ============  =============  =========  ===========  ===========
-        *client* / **server**    **SSLv2**     **SSLv3**     **TLS** [3]_   **TLSv1**  **TLSv1.1**  **TLSv1.2**
-       ------------------------  ------------  ------------  -------------  ---------  -----------  -----------
-        *SSLv2*                    yes           no            no [1]_        no         no         no
-        *SSLv3*                    no            yes           no [2]_        no         no         no
-        *TLS* (*SSLv23*) [3]_      no [1]_       no [2]_       yes            yes        yes        yes
-        *TLSv1*                    no            no            yes            yes        no         no
-        *TLSv1.1*                  no            no            yes            no         yes        no
-        *TLSv1.2*                  no            no            yes            no         no         yes
-       ========================  ============  ============  =============  =========  ===========  ===========
+       ========================  ============  =============  =========  ===========  ===========
+        *client* / **server**    **SSLv3**     **TLS** [3]_   **TLSv1**  **TLSv1.1**  **TLSv1.2**
+       ------------------------  ------------  -------------  ---------  -----------  -----------
+        *SSLv3*                    yes           no [2]_        no         no         no
+        *TLS* (*SSLv23*) [3]_      no [2]_       yes            yes        yes        yes
+        *TLSv1*                    no            yes            yes        no         no
+        *TLSv1.1*                  no            yes            no         yes        no
+        *TLSv1.2*                  no            yes            no         no         yes
+       ========================  ============  =============  =========  ===========  ===========
 
    .. rubric:: Footnotes
-   .. [1] :class:`SSLContext` disables SSLv2 with :data:`OP_NO_SSLv2` by default.
    .. [2] :class:`SSLContext` disables SSLv3 with :data:`OP_NO_SSLv3` by default.
    .. [3] TLS 1.3 protocol will be available with :data:`PROTOCOL_TLS` in
       OpenSSL >= 1.1.1. There is no dedicated PROTOCOL constant for just
@@ -1465,11 +1429,9 @@ to speed up repeated connections from the same clients.
       The context is created with secure default values. The options
       :data:`OP_NO_COMPRESSION`, :data:`OP_CIPHER_SERVER_PREFERENCE`,
       :data:`OP_SINGLE_DH_USE`, :data:`OP_SINGLE_ECDH_USE`,
-      :data:`OP_NO_SSLv2` (except for :data:`PROTOCOL_SSLv2`),
       and :data:`OP_NO_SSLv3` (except for :data:`PROTOCOL_SSLv3`) are
       set by default. The initial cipher suite list contains only ``HIGH``
-      ciphers, no ``NULL`` ciphers and no ``MD5`` ciphers (except for
-      :data:`PROTOCOL_SSLv2`).
+      ciphers, no ``NULL`` ciphers and no ``MD5`` ciphers.
 
 
 :class:`SSLContext` objects have the following methods and attributes:
@@ -1989,7 +1951,7 @@ to speed up repeated connections from the same clients.
 
    An integer representing the set of SSL options enabled on this context.
    The default value is :data:`OP_ALL`, but you can specify other options
-   such as :data:`OP_NO_SSLv2` by ORing them together.
+   such as :data:`OP_NO_SSLv3` by ORing them together.
 
    .. note::
       With versions of OpenSSL older than 0.9.8m, it is only possible
@@ -2000,7 +1962,7 @@ to speed up repeated connections from the same clients.
       :attr:`SSLContext.options` returns :class:`Options` flags:
 
          >>> ssl.create_default_context().options  # doctest: +SKIP
-         <Options.OP_ALL|OP_NO_SSLv3|OP_NO_SSLv2|OP_NO_COMPRESSION: 2197947391>
+         <Options.OP_ALL|OP_NO_SSLv3|OP_NO_COMPRESSION: 2197947391>
 
 .. attribute:: SSLContext.post_handshake_auth
 
@@ -2665,7 +2627,7 @@ Protocol versions
 SSL versions 2 and 3 are considered insecure and are therefore dangerous to
 use.  If you want maximum compatibility between clients and servers, it is
 recommended to use :const:`PROTOCOL_TLS_CLIENT` or
-:const:`PROTOCOL_TLS_SERVER` as the protocol version. SSLv2 and SSLv3 are
+:const:`PROTOCOL_TLS_SERVER` as the protocol version. SSLv3 is
 disabled by default.
 
 ::

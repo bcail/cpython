@@ -203,10 +203,6 @@ def has_tls_version(version):
     :param version: TLS version name or ssl.TLSVersion member
     :return: bool
     """
-    if version == "SSLv2":
-        # never supported and not even in TLSVersion enum
-        return False
-
     if isinstance(version, str):
         version = ssl.TLSVersion.__members__[version]
 
@@ -338,7 +334,6 @@ class BasicSocketTests(unittest.TestCase):
         ssl.OP_NO_COMPRESSION
         self.assertIn(ssl.HAS_SNI, {True, False})
         self.assertIn(ssl.HAS_ECDH, {True, False})
-        ssl.OP_NO_SSLv2
         ssl.OP_NO_SSLv3
         ssl.OP_NO_TLSv1
         ssl.OP_NO_TLSv1_3
@@ -1137,8 +1132,8 @@ class ContextTests(unittest.TestCase):
 
     def test_options(self):
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-        # OP_ALL | OP_NO_SSLv2 | OP_NO_SSLv3 is the default value
-        default = (ssl.OP_ALL | ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3)
+        # OP_ALL | OP_NO_SSLv3 is the default value
+        default = (ssl.OP_ALL | ssl.OP_NO_SSLv3)
         # SSLContext also enables these by default
         default |= (OP_NO_COMPRESSION | OP_CIPHER_SERVER_PREFERENCE |
                     OP_SINGLE_DH_USE | OP_SINGLE_ECDH_USE |
@@ -1607,7 +1602,6 @@ class ContextTests(unittest.TestCase):
             self.assertEqual(ctx.cert_store_stats(), stats)
 
     def _assert_context_options(self, ctx):
-        self.assertEqual(ctx.options & ssl.OP_NO_SSLv2, ssl.OP_NO_SSLv2)
         if OP_NO_COMPRESSION != 0:
             self.assertEqual(ctx.options & OP_NO_COMPRESSION,
                              OP_NO_COMPRESSION)
@@ -3250,7 +3244,7 @@ class ThreadedTests(unittest.TestCase):
 
         # Will choose TLSv1
         try_protocol_combo(ssl.PROTOCOL_TLS, ssl.PROTOCOL_TLS, True,
-                           server_options=ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3)
+                           server_options=ssl.OP_NO_SSLv3)
         if has_tls_version('TLSv1'):
             try_protocol_combo(ssl.PROTOCOL_TLS, ssl.PROTOCOL_TLSv1, False,
                                server_options=ssl.OP_NO_TLSv1)
@@ -3263,8 +3257,6 @@ class ThreadedTests(unittest.TestCase):
         try_protocol_combo(ssl.PROTOCOL_TLSv1, ssl.PROTOCOL_TLSv1, 'TLSv1')
         try_protocol_combo(ssl.PROTOCOL_TLSv1, ssl.PROTOCOL_TLSv1, 'TLSv1', ssl.CERT_OPTIONAL)
         try_protocol_combo(ssl.PROTOCOL_TLSv1, ssl.PROTOCOL_TLSv1, 'TLSv1', ssl.CERT_REQUIRED)
-        if has_tls_version('SSLv2'):
-            try_protocol_combo(ssl.PROTOCOL_TLSv1, ssl.PROTOCOL_SSLv2, False)
         if has_tls_version('SSLv3'):
             try_protocol_combo(ssl.PROTOCOL_TLSv1, ssl.PROTOCOL_SSLv3, False)
         try_protocol_combo(ssl.PROTOCOL_TLSv1, ssl.PROTOCOL_TLS, False,
@@ -3277,8 +3269,6 @@ class ThreadedTests(unittest.TestCase):
         if support.verbose:
             sys.stdout.write("\n")
         try_protocol_combo(ssl.PROTOCOL_TLSv1_1, ssl.PROTOCOL_TLSv1_1, 'TLSv1.1')
-        if has_tls_version('SSLv2'):
-            try_protocol_combo(ssl.PROTOCOL_TLSv1_1, ssl.PROTOCOL_SSLv2, False)
         if has_tls_version('SSLv3'):
             try_protocol_combo(ssl.PROTOCOL_TLSv1_1, ssl.PROTOCOL_SSLv3, False)
         try_protocol_combo(ssl.PROTOCOL_TLSv1_1, ssl.PROTOCOL_TLS, False,
@@ -3294,10 +3284,8 @@ class ThreadedTests(unittest.TestCase):
         if support.verbose:
             sys.stdout.write("\n")
         try_protocol_combo(ssl.PROTOCOL_TLSv1_2, ssl.PROTOCOL_TLSv1_2, 'TLSv1.2',
-                           server_options=ssl.OP_NO_SSLv3|ssl.OP_NO_SSLv2,
-                           client_options=ssl.OP_NO_SSLv3|ssl.OP_NO_SSLv2,)
-        if has_tls_version('SSLv2'):
-            try_protocol_combo(ssl.PROTOCOL_TLSv1_2, ssl.PROTOCOL_SSLv2, False)
+                           server_options=ssl.OP_NO_SSLv3,
+                           client_options=ssl.OP_NO_SSLv3,)
         if has_tls_version('SSLv3'):
             try_protocol_combo(ssl.PROTOCOL_TLSv1_2, ssl.PROTOCOL_SSLv3, False)
         try_protocol_combo(ssl.PROTOCOL_TLSv1_2, ssl.PROTOCOL_TLS, False,

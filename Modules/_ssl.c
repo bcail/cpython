@@ -148,8 +148,6 @@ extern const SSL_METHOD *TLSv1_2_method(void);
 #define INVALID_SOCKET (-1)
 #endif
 
-#define OPENSSL_NO_SSL2
-
 /* Default cipher suites */
 #ifndef PY_SSL_DEFAULT_CIPHERS
 #define PY_SSL_DEFAULT_CIPHERS 1
@@ -204,7 +202,6 @@ enum py_ssl_cert_requirements {
 };
 
 enum py_ssl_version {
-    PY_SSL_VERSION_SSL2,
     PY_SSL_VERSION_SSL3=1,
     PY_SSL_VERSION_TLS, /* SSLv23 */
     PY_SSL_VERSION_TLS1,
@@ -2989,8 +2986,6 @@ _ssl__SSLContext_impl(PyTypeObject *type, int proto_version)
     }
     /* Defaults */
     options = SSL_OP_ALL & ~SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS;
-    if (proto_version != PY_SSL_VERSION_SSL2)
-        options |= SSL_OP_NO_SSLv2;
     if (proto_version != PY_SSL_VERSION_SSL3)
         options |= SSL_OP_NO_SSLv3;
     /* Minimal security flags for server and client side context.
@@ -3015,17 +3010,12 @@ _ssl__SSLContext_impl(PyTypeObject *type, int proto_version)
 
     /* A bare minimum cipher list without completely broken cipher suites.
      * It's far from perfect but gives users a better head start. */
-    if (proto_version != PY_SSL_VERSION_SSL2) {
 #if PY_SSL_DEFAULT_CIPHERS == 2
-        /* stick to OpenSSL's default settings */
-        result = 1;
+    /* stick to OpenSSL's default settings */
+    result = 1;
 #else
-        result = SSL_CTX_set_cipher_list(ctx, PY_SSL_DEFAULT_CIPHER_STRING);
+    result = SSL_CTX_set_cipher_list(ctx, PY_SSL_DEFAULT_CIPHER_STRING);
 #endif
-    } else {
-        /* SSLv2 needs MD5 */
-        result = SSL_CTX_set_cipher_list(ctx, "HIGH:!aNULL:!eNULL");
-    }
     if (result == 0) {
         Py_DECREF(self);
         ERR_clear_error();
@@ -5829,7 +5819,6 @@ PyInit__ssl(void)
     /* protocol options */
     PyModule_AddIntConstant(m, "OP_ALL",
                             SSL_OP_ALL & ~SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS);
-    PyModule_AddIntConstant(m, "OP_NO_SSLv2", SSL_OP_NO_SSLv2);
     PyModule_AddIntConstant(m, "OP_NO_SSLv3", SSL_OP_NO_SSLv3);
     PyModule_AddIntConstant(m, "OP_NO_TLSv1", SSL_OP_NO_TLSv1);
     PyModule_AddIntConstant(m, "OP_NO_TLSv1_1", SSL_OP_NO_TLSv1_1);
@@ -5916,8 +5905,6 @@ addbool(m, "HAS_SNI", 1);
 addbool(m, "HAS_NPN", 0);
 
 addbool(m, "HAS_ALPN", 1);
-
-addbool(m, "HAS_SSLv2", 0);
 
 addbool(m, "HAS_SSLv3", 0);
 
