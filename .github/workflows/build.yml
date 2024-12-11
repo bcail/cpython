@@ -8,6 +8,7 @@ on:
     branches:
     - 3.7-updated
     - custom
+    - dev
   pull_request:
     branches:
     - 3.7-updated
@@ -67,27 +68,21 @@ jobs:
 
   build_macos:
     name: 'macOS'
-    runs-on: macos-12
+    runs-on: macos-13
     env:
       HOMEBREW_NO_ANALYTICS: 1
       HOMEBREW_NO_AUTO_UPDATE: 1
       HOMEBREW_NO_INSTALL_CLEANUP: 1
     steps:
     - uses: actions/checkout@v4
+    - name: Install Homebrew dependencies
+      run: brew install pkg-config openssl@3.0 xz gdbm tcl-tk
     - name: Configure CPython
       run: |
-        brew install pkg-config openssl@3.0 xz gdbm tcl-tk
-        brew install zlib bzip2 ncurses readline sqlite
         SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX12.sdk \
         CC=clang \
-        CPPFLAGS="-I$(brew --prefix gdbm)/include -I$(brew --prefix xz)/include \
-            -I$(brew --prefix zlib)/include  -I$(brew --prefix bzip2)/include \
-            -I$(brew --prefix ncurses)/include -I$(brew --prefix readline)/include \
-            -I$(brew --prefix sqlite)/include" \
-        LDFLAGS="-L$(brew --prefix gdbm)/lib -L$(brew --prefix xz)/lib \
-            -L$(brew --prefix zlib)/lib  -L$(brew --prefix bzip2)/lib \
-            -L$(brew --prefix ncurses)/lib -L$(brew --prefix readline)/lib \
-            -L$(brew --prefix sqlite)/lib" \
+        CPPFLAGS="-I$(brew --prefix gdbm)/include -I$(brew --prefix xz)/include" \
+        LDFLAGS="-L$(brew --prefix gdbm)/lib -L$(brew --prefix xz)/lib" \
         ./configure --prefix=/opt/python-dev \
             --with-pydebug \
             --with-openssl="$(brew --prefix openssl@3.0)" \
