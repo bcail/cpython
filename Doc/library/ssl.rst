@@ -671,30 +671,6 @@ Constants
 
    .. versionadded:: 3.6
 
-.. data:: PROTOCOL_SSLv23
-
-   Alias for :data:`PROTOCOL_TLS`.
-
-   .. deprecated:: 3.6
-
-      Use :data:`PROTOCOL_TLS` instead.
-
-.. data:: PROTOCOL_SSLv3
-
-   Selects SSL version 3 as the channel encryption protocol.
-
-   This protocol is not be available if OpenSSL is compiled with the
-   ``OPENSSL_NO_SSLv3`` flag.
-
-   .. warning::
-
-      SSL version 3 is insecure.  Its use is highly discouraged.
-
-   .. deprecated:: 3.6
-
-      OpenSSL has deprecated all version specific protocols. Use the default
-      protocol :data:`PROTOCOL_TLS` with flags like :data:`OP_NO_SSLv3` instead.
-
 .. data:: PROTOCOL_TLSv1
 
    Selects TLS version 1.0 as the channel encryption protocol.

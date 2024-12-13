@@ -5782,8 +5782,6 @@ PyInit__ssl(void)
 #undef ADD_AD_CONSTANT
 
     /* protocol versions */
-    PyModule_AddIntConstant(m, "PROTOCOL_SSLv23",
-                            PY_SSL_VERSION_TLS);
     PyModule_AddIntConstant(m, "PROTOCOL_TLS",
                             PY_SSL_VERSION_TLS);
     PyModule_AddIntConstant(m, "PROTOCOL_TLS_CLIENT",

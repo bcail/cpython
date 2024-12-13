@@ -48,7 +48,6 @@ CERT_REQUIRED - certificates are required, and will be validated, and
 
 The following constants identify various SSL protocol variants:
 
-PROTOCOL_SSLv23
 PROTOCOL_TLS
 PROTOCOL_TLS_CLIENT
 PROTOCOL_TLS_SERVER
@@ -119,7 +118,7 @@ from _ssl import _DEFAULT_CIPHERS, _OPENSSL_API_VERSION
 
 _IntEnum._convert(
     '_SSLMethod', __name__,
-    lambda name: name.startswith('PROTOCOL_') and name != 'PROTOCOL_SSLv23',
+    lambda name: name.startswith('PROTOCOL_'),
     source=_ssl)
 
 _IntFlag._convert(
@@ -147,7 +146,6 @@ _IntEnum._convert(
     lambda name: name.startswith('CERT_'),
     source=_ssl)
 
-PROTOCOL_SSLv23 = _SSLMethod.PROTOCOL_SSLv23 = _SSLMethod.PROTOCOL_TLS
 _PROTOCOL_NAMES = {value: name for name, value in _SSLMethod.__members__.items()}
 
 

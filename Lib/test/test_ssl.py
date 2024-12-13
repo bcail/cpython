@@ -337,7 +337,6 @@ class BasicSocketTests(unittest.TestCase):
         ssl.OP_NO_TLSv1_3
         ssl.OP_NO_TLSv1_1
         ssl.OP_NO_TLSv1_2
-        self.assertEqual(ssl.PROTOCOL_TLS, ssl.PROTOCOL_SSLv23)
 
     def test_private_init(self):
         with self.assertRaisesRegex(TypeError, "public constructor"):
