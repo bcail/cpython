@@ -48,7 +48,6 @@ CERT_REQUIRED - certificates are required, and will be validated, and
 
 The following constants identify various SSL protocol variants:
 
-PROTOCOL_SSLv3
 PROTOCOL_SSLv23
 PROTOCOL_TLS
 PROTOCOL_TLS_CLIENT
@@ -112,7 +111,7 @@ except ImportError:
 
 
 from _ssl import (
-    HAS_SNI, HAS_ECDH, HAS_NPN, HAS_ALPN, HAS_SSLv3, HAS_TLSv1,
+    HAS_SNI, HAS_ECDH, HAS_NPN, HAS_ALPN, HAS_TLSv1,
     HAS_TLSv1_1, HAS_TLSv1_2, HAS_TLSv1_3
 )
 from _ssl import _DEFAULT_CIPHERS, _OPENSSL_API_VERSION
@@ -154,7 +153,6 @@ _PROTOCOL_NAMES = {value: name for name, value in _SSLMethod.__members__.items()
 
 class TLSVersion(_IntEnum):
     MINIMUM_SUPPORTED = _ssl.PROTO_MINIMUM_SUPPORTED
-    SSLv3 = _ssl.PROTO_SSLv3
     TLSv1 = _ssl.PROTO_TLSv1
     TLSv1_1 = _ssl.PROTO_TLSv1_1
     TLSv1_2 = _ssl.PROTO_TLSv1_2
@@ -578,8 +576,6 @@ class SSLContext(_SSLContext):
 
         @minimum_version.setter
         def minimum_version(self, value):
-            if value == TLSVersion.SSLv3:
-                self.options &= ~Options.OP_NO_SSLv3
             super(SSLContext, SSLContext).minimum_version.__set__(self, value)
 
         @property
@@ -728,7 +724,7 @@ def create_default_context(purpose=Purpose.SERVER_AUTH, *, cafile=None,
     if not isinstance(purpose, _ASN1Object):
         raise TypeError(purpose)
 
-    # SSLContext sets OP_NO_SSLv3, OP_NO_COMPRESSION,
+    # SSLContext sets OP_NO_COMPRESSION,
     # OP_CIPHER_SERVER_PREFERENCE, OP_SINGLE_DH_USE and OP_SINGLE_ECDH_USE
     # by default.
     context = SSLContext(PROTOCOL_TLS)
@@ -766,7 +762,7 @@ def _create_unverified_context(protocol=PROTOCOL_TLS, *, cert_reqs=CERT_NONE,
     if not isinstance(purpose, _ASN1Object):
         raise TypeError(purpose)
 
-    # SSLContext sets OP_NO_SSLv3, OP_NO_COMPRESSION,
+    # SSLContext sets OP_NO_COMPRESSION,
     # OP_CIPHER_SERVER_PREFERENCE, OP_SINGLE_DH_USE and OP_SINGLE_ECDH_USE
     # by default.
     context = SSLContext(protocol)

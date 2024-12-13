@@ -202,8 +202,7 @@ enum py_ssl_cert_requirements {
 };
 
 enum py_ssl_version {
-    PY_SSL_VERSION_SSL3=1,
-    PY_SSL_VERSION_TLS, /* SSLv23 */
+    PY_SSL_VERSION_TLS=2, /* SSLv23 */
     PY_SSL_VERSION_TLS1,
     PY_SSL_VERSION_TLS1_1,
     PY_SSL_VERSION_TLS1_2,
@@ -213,7 +212,6 @@ enum py_ssl_version {
 
 enum py_proto_version {
     PY_PROTO_MINIMUM_SUPPORTED = -2,
-    PY_PROTO_SSLv3 = SSL3_VERSION,
     PY_PROTO_TLSv1 = TLS1_VERSION,
     PY_PROTO_TLSv1_1 = TLS1_1_VERSION,
     PY_PROTO_TLSv1_2 = TLS1_2_VERSION,
@@ -2986,8 +2984,6 @@ _ssl__SSLContext_impl(PyTypeObject *type, int proto_version)
     }
     /* Defaults */
     options = SSL_OP_ALL & ~SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS;
-    if (proto_version != PY_SSL_VERSION_SSL3)
-        options |= SSL_OP_NO_SSLv3;
     /* Minimal security flags for server and client side context.
      * Client sockets ignore server-side parameters. */
 #ifdef SSL_OP_NO_COMPRESSION
@@ -5819,7 +5815,6 @@ PyInit__ssl(void)
     /* protocol options */
     PyModule_AddIntConstant(m, "OP_ALL",
                             SSL_OP_ALL & ~SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS);
-    PyModule_AddIntConstant(m, "OP_NO_SSLv3", SSL_OP_NO_SSLv3);
     PyModule_AddIntConstant(m, "OP_NO_TLSv1", SSL_OP_NO_TLSv1);
     PyModule_AddIntConstant(m, "OP_NO_TLSv1_1", SSL_OP_NO_TLSv1_1);
     PyModule_AddIntConstant(m, "OP_NO_TLSv1_2", SSL_OP_NO_TLSv1_2);
@@ -5882,7 +5877,6 @@ PyInit__ssl(void)
                             PY_PROTO_MINIMUM_SUPPORTED);
     PyModule_AddIntConstant(m, "PROTO_MAXIMUM_SUPPORTED",
                             PY_PROTO_MAXIMUM_SUPPORTED);
-    PyModule_AddIntConstant(m, "PROTO_SSLv3", PY_PROTO_SSLv3);
     PyModule_AddIntConstant(m, "PROTO_TLSv1", PY_PROTO_TLSv1);
     PyModule_AddIntConstant(m, "PROTO_TLSv1_1", PY_PROTO_TLSv1_1);
     PyModule_AddIntConstant(m, "PROTO_TLSv1_2", PY_PROTO_TLSv1_2);
@@ -5905,8 +5899,6 @@ addbool(m, "HAS_SNI", 1);
 addbool(m, "HAS_NPN", 0);
 
 addbool(m, "HAS_ALPN", 1);
-
-addbool(m, "HAS_SSLv3", 0);
 
 #if defined(TLS1_VERSION) && !defined(OPENSSL_NO_TLS1)
     addbool(m, "HAS_TLSv1", 1);
