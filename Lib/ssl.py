@@ -51,7 +51,6 @@ The following constants identify various SSL protocol variants:
 PROTOCOL_TLS
 PROTOCOL_TLS_CLIENT
 PROTOCOL_TLS_SERVER
-PROTOCOL_TLSv1
 PROTOCOL_TLSv1_1
 PROTOCOL_TLSv1_2
 
@@ -110,7 +109,7 @@ except ImportError:
 
 
 from _ssl import (
-    HAS_SNI, HAS_ECDH, HAS_NPN, HAS_ALPN, HAS_TLSv1,
+    HAS_SNI, HAS_ECDH, HAS_NPN, HAS_ALPN,
     HAS_TLSv1_1, HAS_TLSv1_2, HAS_TLSv1_3
 )
 from _ssl import _DEFAULT_CIPHERS, _OPENSSL_API_VERSION

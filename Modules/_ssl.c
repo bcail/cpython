@@ -203,7 +203,6 @@ enum py_ssl_cert_requirements {
 
 enum py_ssl_version {
     PY_SSL_VERSION_TLS=2, /* SSLv23 */
-    PY_SSL_VERSION_TLS1,
     PY_SSL_VERSION_TLS1_1,
     PY_SSL_VERSION_TLS1_2,
     PY_SSL_VERSION_TLS_CLIENT=0x10,
@@ -2897,13 +2896,6 @@ _ssl__SSLContext_impl(PyTypeObject *type, int proto_version)
 
     PySSL_BEGIN_ALLOW_THREADS
     switch(proto_version) {
-#if (defined(TLS1_VERSION) && \
-        !defined(OPENSSL_NO_TLS1) && \
-        !defined(OPENSSL_NO_TLS1_METHOD))
-    case PY_SSL_VERSION_TLS1:
-        ctx = SSL_CTX_new(TLSv1_method());
-        break;
-#endif
 #if (defined(TLS1_1_VERSION) && \
         !defined(OPENSSL_NO_TLS1_1) && \
         !defined(OPENSSL_NO_TLS1_1_METHOD))
@@ -5788,8 +5780,6 @@ PyInit__ssl(void)
                             PY_SSL_VERSION_TLS_CLIENT);
     PyModule_AddIntConstant(m, "PROTOCOL_TLS_SERVER",
                             PY_SSL_VERSION_TLS_SERVER);
-    PyModule_AddIntConstant(m, "PROTOCOL_TLSv1",
-                            PY_SSL_VERSION_TLS1);
     PyModule_AddIntConstant(m, "PROTOCOL_TLSv1_1",
                             PY_SSL_VERSION_TLS1_1);
     PyModule_AddIntConstant(m, "PROTOCOL_TLSv1_2",
@@ -5882,12 +5872,6 @@ addbool(m, "HAS_SNI", 1);
 addbool(m, "HAS_NPN", 0);
 
 addbool(m, "HAS_ALPN", 1);
-
-#if defined(TLS1_VERSION) && !defined(OPENSSL_NO_TLS1)
-    addbool(m, "HAS_TLSv1", 1);
-#else
-    addbool(m, "HAS_TLSv1", 0);
-#endif
 
 #if defined(TLS1_1_VERSION) && !defined(OPENSSL_NO_TLS1_1)
     addbool(m, "HAS_TLSv1_1", 1);

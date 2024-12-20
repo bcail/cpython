@@ -671,15 +671,6 @@ Constants
 
    .. versionadded:: 3.6
 
-.. data:: PROTOCOL_TLSv1
-
-   Selects TLS version 1.0 as the channel encryption protocol.
-
-   .. deprecated:: 3.6
-
-      OpenSSL has deprecated all version specific protocols. Use the default
-      protocol :data:`PROTOCOL_TLS` with flags like :data:`OP_NO_SSLv3` instead.
-
 .. data:: PROTOCOL_TLSv1_1
 
    Selects TLS version 1.1 as the channel encryption protocol.
@@ -881,18 +872,6 @@ Constants
    which protocols you want to support.
 
    .. versionadded:: 3.3
-
-.. data:: HAS_SSLv3
-
-   Whether the OpenSSL library has built-in support for the SSL 3.0 protocol.
-
-   .. versionadded:: 3.7
-
-.. data:: HAS_TLSv1
-
-   Whether the OpenSSL library has built-in support for the TLS 1.0 protocol.
-
-   .. versionadded:: 3.7
 
 .. data:: HAS_TLSv1_1
 
