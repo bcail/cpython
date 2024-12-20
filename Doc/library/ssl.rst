@@ -873,12 +873,6 @@ Constants
 
    .. versionadded:: 3.3
 
-.. data:: HAS_TLSv1_1
-
-   Whether the OpenSSL library has built-in support for the TLS 1.1 protocol.
-
-   .. versionadded:: 3.7
-
 .. data:: HAS_TLSv1_2
 
    Whether the OpenSSL library has built-in support for the TLS 1.2 protocol.

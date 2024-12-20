@@ -203,7 +203,6 @@ enum py_ssl_cert_requirements {
 
 enum py_ssl_version {
     PY_SSL_VERSION_TLS=2, /* SSLv23 */
-    PY_SSL_VERSION_TLS1_1,
     PY_SSL_VERSION_TLS1_2,
     PY_SSL_VERSION_TLS_CLIENT=0x10,
     PY_SSL_VERSION_TLS_SERVER,
@@ -211,8 +210,6 @@ enum py_ssl_version {
 
 enum py_proto_version {
     PY_PROTO_MINIMUM_SUPPORTED = -2,
-    PY_PROTO_TLSv1 = TLS1_VERSION,
-    PY_PROTO_TLSv1_1 = TLS1_1_VERSION,
     PY_PROTO_TLSv1_2 = TLS1_2_VERSION,
 #ifdef TLS1_3_VERSION
     PY_PROTO_TLSv1_3 = TLS1_3_VERSION,
@@ -225,11 +222,7 @@ enum py_proto_version {
  * available version, and the other way around. We have to figure out the
  * minimum and maximum available version on our own and hope for the best.
  */
-#if defined(TLS1_VERSION) && !defined(OPENSSL_NO_TLS1)
-    PY_PROTO_MINIMUM_AVAILABLE = PY_PROTO_TLSv1,
-#elif defined(TLS1_1_VERSION) && !defined(OPENSSL_NO_TLS1_1)
-    PY_PROTO_MINIMUM_AVAILABLE = PY_PROTO_TLSv1_1,
-#elif defined(TLS1_2_VERSION) && !defined(OPENSSL_NO_TLS1_2)
+#if defined(TLS1_2_VERSION) && !defined(OPENSSL_NO_TLS1_2)
     PY_PROTO_MINIMUM_AVAILABLE = PY_PROTO_TLSv1_2,
 #elif defined(TLS1_3_VERSION) && !defined(OPENSSL_NO_TLS1_3)
     PY_PROTO_MINIMUM_AVAILABLE = PY_PROTO_TLSv1_3,
@@ -241,10 +234,6 @@ enum py_proto_version {
     PY_PROTO_MAXIMUM_AVAILABLE = PY_PROTO_TLSv1_3,
 #elif defined(TLS1_2_VERSION) && !defined(OPENSSL_NO_TLS1_2)
     PY_PROTO_MAXIMUM_AVAILABLE = PY_PROTO_TLSv1_2,
-#elif defined(TLS1_1_VERSION) && !defined(OPENSSL_NO_TLS1_1)
-    PY_PROTO_MAXIMUM_AVAILABLE = PY_PROTO_TLSv1_1,
-#elif defined(TLS1_VERSION) && !defined(OPENSSL_NO_TLS1)
-    PY_PROTO_MAXIMUM_AVAILABLE = PY_PROTO_TLSv1,
 #else
     #error "PY_PROTO_MAXIMUM_AVAILABLE not found"
 #endif
@@ -2896,13 +2885,6 @@ _ssl__SSLContext_impl(PyTypeObject *type, int proto_version)
 
     PySSL_BEGIN_ALLOW_THREADS
     switch(proto_version) {
-#if (defined(TLS1_1_VERSION) && \
-        !defined(OPENSSL_NO_TLS1_1) && \
-        !defined(OPENSSL_NO_TLS1_1_METHOD))
-    case PY_SSL_VERSION_TLS1_1:
-        ctx = SSL_CTX_new(TLSv1_1_method());
-        break;
-#endif
 #if (defined(TLS1_2_VERSION) && \
         !defined(OPENSSL_NO_TLS1_2) && \
         !defined(OPENSSL_NO_TLS1_2_METHOD))
@@ -5780,16 +5762,12 @@ PyInit__ssl(void)
                             PY_SSL_VERSION_TLS_CLIENT);
     PyModule_AddIntConstant(m, "PROTOCOL_TLS_SERVER",
                             PY_SSL_VERSION_TLS_SERVER);
-    PyModule_AddIntConstant(m, "PROTOCOL_TLSv1_1",
-                            PY_SSL_VERSION_TLS1_1);
     PyModule_AddIntConstant(m, "PROTOCOL_TLSv1_2",
                             PY_SSL_VERSION_TLS1_2);
 
     /* protocol options */
     PyModule_AddIntConstant(m, "OP_ALL",
                             SSL_OP_ALL & ~SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS);
-    PyModule_AddIntConstant(m, "OP_NO_TLSv1", SSL_OP_NO_TLSv1);
-    PyModule_AddIntConstant(m, "OP_NO_TLSv1_1", SSL_OP_NO_TLSv1_1);
     PyModule_AddIntConstant(m, "OP_NO_TLSv1_2", SSL_OP_NO_TLSv1_2);
 #ifdef SSL_OP_NO_TLSv1_3
     PyModule_AddIntConstant(m, "OP_NO_TLSv1_3", SSL_OP_NO_TLSv1_3);
@@ -5850,8 +5828,6 @@ PyInit__ssl(void)
                             PY_PROTO_MINIMUM_SUPPORTED);
     PyModule_AddIntConstant(m, "PROTO_MAXIMUM_SUPPORTED",
                             PY_PROTO_MAXIMUM_SUPPORTED);
-    PyModule_AddIntConstant(m, "PROTO_TLSv1", PY_PROTO_TLSv1);
-    PyModule_AddIntConstant(m, "PROTO_TLSv1_1", PY_PROTO_TLSv1_1);
     PyModule_AddIntConstant(m, "PROTO_TLSv1_2", PY_PROTO_TLSv1_2);
     PyModule_AddIntConstant(m, "PROTO_TLSv1_3", PY_PROTO_TLSv1_3);
 
@@ -5872,12 +5848,6 @@ addbool(m, "HAS_SNI", 1);
 addbool(m, "HAS_NPN", 0);
 
 addbool(m, "HAS_ALPN", 1);
-
-#if defined(TLS1_1_VERSION) && !defined(OPENSSL_NO_TLS1_1)
-    addbool(m, "HAS_TLSv1_1", 1);
-#else
-    addbool(m, "HAS_TLSv1_1", 0);
-#endif
 
 #if defined(TLS1_2_VERSION) && !defined(OPENSSL_NO_TLS1_2)
     addbool(m, "HAS_TLSv1_2", 1);

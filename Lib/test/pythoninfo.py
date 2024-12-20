@@ -462,7 +462,6 @@ def collect_ssl(info_add):
         'OPENSSL_VERSION_INFO',
         'HAS_SNI',
         'OP_ALL',
-        'OP_NO_TLSv1_1',
     )
     copy_attributes(info_add, ssl, 'ssl.%s', attributes, formatter=format_attr)
 

@@ -51,7 +51,6 @@ The following constants identify various SSL protocol variants:
 PROTOCOL_TLS
 PROTOCOL_TLS_CLIENT
 PROTOCOL_TLS_SERVER
-PROTOCOL_TLSv1_1
 PROTOCOL_TLSv1_2
 
 The following constants identify various SSL alert message descriptions as per
@@ -110,7 +109,7 @@ except ImportError:
 
 from _ssl import (
     HAS_SNI, HAS_ECDH, HAS_NPN, HAS_ALPN,
-    HAS_TLSv1_1, HAS_TLSv1_2, HAS_TLSv1_3
+    HAS_TLSv1_2, HAS_TLSv1_3
 )
 from _ssl import _DEFAULT_CIPHERS, _OPENSSL_API_VERSION
 
@@ -150,8 +149,6 @@ _PROTOCOL_NAMES = {value: name for name, value in _SSLMethod.__members__.items()
 
 class TLSVersion(_IntEnum):
     MINIMUM_SUPPORTED = _ssl.PROTO_MINIMUM_SUPPORTED
-    TLSv1 = _ssl.PROTO_TLSv1
-    TLSv1_1 = _ssl.PROTO_TLSv1_1
     TLSv1_2 = _ssl.PROTO_TLSv1_2
     TLSv1_3 = _ssl.PROTO_TLSv1_3
     MAXIMUM_SUPPORTED = _ssl.PROTO_MAXIMUM_SUPPORTED
