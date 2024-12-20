@@ -463,11 +463,6 @@ lcg_urandom(unsigned int x0, unsigned char *buffer, size_t size)
    RNG running in the user land. The kernel has a direct access to the hardware
    and has access to hardware RNG, they are used as entropy sources.
 
-   Note: the OpenSSL RAND_pseudo_bytes() function does not automatically reseed
-   its RNG on fork(), two child processes (with the same pid) generate the same
-   random numbers: see issue #18747. Kernel RNGs don't have this issue,
-   they have access to good quality entropy sources.
-
    If raise is zero:
 
    - Don't raise an exception on error

@@ -896,36 +896,6 @@ exit:
     return return_value;
 }
 
-PyDoc_STRVAR(_ssl_RAND_pseudo_bytes__doc__,
-"RAND_pseudo_bytes($module, n, /)\n"
-"--\n"
-"\n"
-"Generate n pseudo-random bytes.\n"
-"\n"
-"Return a pair (bytes, is_cryptographic).  is_cryptographic is True\n"
-"if the bytes generated are cryptographically strong.");
-
-#define _SSL_RAND_PSEUDO_BYTES_METHODDEF    \
-    {"RAND_pseudo_bytes", (PyCFunction)_ssl_RAND_pseudo_bytes, METH_O, _ssl_RAND_pseudo_bytes__doc__},
-
-static PyObject *
-_ssl_RAND_pseudo_bytes_impl(PyObject *module, int n);
-
-static PyObject *
-_ssl_RAND_pseudo_bytes(PyObject *module, PyObject *arg)
-{
-    PyObject *return_value = NULL;
-    int n;
-
-    if (!PyArg_Parse(arg, "i:RAND_pseudo_bytes", &n)) {
-        goto exit;
-    }
-    return_value = _ssl_RAND_pseudo_bytes_impl(module, n);
-
-exit:
-    return return_value;
-}
-
 PyDoc_STRVAR(_ssl_RAND_status__doc__,
 "RAND_status($module, /)\n"
 "--\n"
