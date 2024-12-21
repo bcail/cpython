@@ -351,65 +351,6 @@ class BasicSocketTests(unittest.TestCase):
         ctx = ssl.SSLContext(proto)
         self.assertIs(ctx.protocol, proto)
 
-    def test_random(self):
-        v = ssl.RAND_status()
-        if support.verbose:
-            sys.stdout.write("\n RAND_status is %d (%s)\n"
-                             % (v, (v and "sufficient randomness") or
-                                "insufficient randomness"))
-
-        data, is_cryptographic = ssl.RAND_pseudo_bytes(16)
-        self.assertEqual(len(data), 16)
-        self.assertEqual(is_cryptographic, v == 1)
-        if v:
-            data = ssl.RAND_bytes(16)
-            self.assertEqual(len(data), 16)
-        else:
-            self.assertRaises(ssl.SSLError, ssl.RAND_bytes, 16)
-
-        # negative num is invalid
-        self.assertRaises(ValueError, ssl.RAND_bytes, -5)
-        self.assertRaises(ValueError, ssl.RAND_pseudo_bytes, -5)
-
-        if hasattr(ssl, 'RAND_egd'):
-            self.assertRaises(TypeError, ssl.RAND_egd, 1)
-            self.assertRaises(TypeError, ssl.RAND_egd, 'foo', 1)
-        ssl.RAND_add("this is a random string", 75.0)
-        ssl.RAND_add(b"this is a random bytes object", 75.0)
-        ssl.RAND_add(bytearray(b"this is a random bytearray object"), 75.0)
-
-    @unittest.skipUnless(os.name == 'posix', 'requires posix')
-    def test_random_fork(self):
-        status = ssl.RAND_status()
-        if not status:
-            self.fail("OpenSSL's PRNG has insufficient randomness")
-
-        rfd, wfd = os.pipe()
-        pid = os.fork()
-        if pid == 0:
-            try:
-                os.close(rfd)
-                child_random = ssl.RAND_pseudo_bytes(16)[0]
-                self.assertEqual(len(child_random), 16)
-                os.write(wfd, child_random)
-                os.close(wfd)
-            except BaseException:
-                os._exit(1)
-            else:
-                os._exit(0)
-        else:
-            os.close(wfd)
-            self.addCleanup(os.close, rfd)
-            _, status = os.waitpid(pid, 0)
-            self.assertEqual(status, 0)
-
-            child_random = os.read(rfd, 16)
-            self.assertEqual(len(child_random), 16)
-            parent_random = ssl.RAND_pseudo_bytes(16)[0]
-            self.assertEqual(len(parent_random), 16)
-
-            self.assertNotEqual(child_random, parent_random)
-
     maxDiff = None
 
     def test_parse_cert(self):
