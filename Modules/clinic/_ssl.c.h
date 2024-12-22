@@ -832,43 +832,6 @@ _ssl_MemoryBIO_write_eof(PySSLMemoryBIO *self, PyObject *Py_UNUSED(ignored))
     return _ssl_MemoryBIO_write_eof_impl(self);
 }
 
-PyDoc_STRVAR(_ssl_RAND_add__doc__,
-"RAND_add($module, string, entropy, /)\n"
-"--\n"
-"\n"
-"Mix string into the OpenSSL PRNG state.\n"
-"\n"
-"entropy (a float) is a lower bound on the entropy contained in\n"
-"string.  See RFC 4086.");
-
-#define _SSL_RAND_ADD_METHODDEF    \
-    {"RAND_add", (PyCFunction)_ssl_RAND_add, METH_FASTCALL, _ssl_RAND_add__doc__},
-
-static PyObject *
-_ssl_RAND_add_impl(PyObject *module, Py_buffer *view, double entropy);
-
-static PyObject *
-_ssl_RAND_add(PyObject *module, PyObject *const *args, Py_ssize_t nargs)
-{
-    PyObject *return_value = NULL;
-    Py_buffer view = {NULL, NULL};
-    double entropy;
-
-    if (!_PyArg_ParseStack(args, nargs, "s*d:RAND_add",
-        &view, &entropy)) {
-        goto exit;
-    }
-    return_value = _ssl_RAND_add_impl(module, &view, entropy);
-
-exit:
-    /* Cleanup for view */
-    if (view.obj) {
-       PyBuffer_Release(&view);
-    }
-
-    return return_value;
-}
-
 PyDoc_STRVAR(_ssl_RAND_bytes__doc__,
 "RAND_bytes($module, n, /)\n"
 "--\n"
@@ -1130,4 +1093,4 @@ exit:
 #ifndef _SSL_ENUM_CRLS_METHODDEF
     #define _SSL_ENUM_CRLS_METHODDEF
 #endif /* !defined(_SSL_ENUM_CRLS_METHODDEF) */
-/*[clinic end generated code: output=e7dc1120e3df0cc1 input=a9049054013a1b77]*/
+/*[clinic end generated code: output=fab34ebbff143479 input=a9049054013a1b77]*/

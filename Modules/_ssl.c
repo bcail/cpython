@@ -4960,36 +4960,6 @@ static PyTypeObject PySSLSession_Type = {
 
 
 /* helper routines for seeding the SSL PRNG */
-/*[clinic input]
-_ssl.RAND_add
-    string as view: Py_buffer(accept={str, buffer})
-    entropy: double
-    /
-
-Mix string into the OpenSSL PRNG state.
-
-entropy (a float) is a lower bound on the entropy contained in
-string.  See RFC 4086.
-[clinic start generated code]*/
-
-static PyObject *
-_ssl_RAND_add_impl(PyObject *module, Py_buffer *view, double entropy)
-/*[clinic end generated code: output=e6dd48df9c9024e9 input=5c33017422828f5c]*/
-{
-    const char *buf;
-    Py_ssize_t len, written;
-
-    buf = (const char *)view->buf;
-    len = view->len;
-    do {
-        written = Py_MIN(len, INT_MAX);
-        RAND_add(buf, (int)written, entropy);
-        buf += written;
-        len -= written;
-    } while (len);
-    Py_RETURN_NONE;
-}
-
 static PyObject *
 PySSL_RAND(int len, int pseudo)
 {
@@ -5531,7 +5501,6 @@ _ssl_enum_crls_impl(PyObject *module, const char *store_name)
 /* List of functions exported by this module. */
 static PyMethodDef PySSL_methods[] = {
     _SSL__TEST_DECODE_CERT_METHODDEF
-    _SSL_RAND_ADD_METHODDEF
     _SSL_RAND_BYTES_METHODDEF
     _SSL_RAND_EGD_METHODDEF
     _SSL_RAND_STATUS_METHODDEF

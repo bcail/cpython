@@ -317,16 +317,6 @@ Random generation
 
    .. availability:: not available with LibreSSL and OpenSSL > 1.1.0.
 
-.. function:: RAND_add(bytes, entropy)
-
-   Mix the given *bytes* into the SSL pseudo-random number generator.  The
-   parameter *entropy* (a float) is a lower bound on the entropy contained in
-   string (so you can always use :const:`0.0`).  See :rfc:`1750` for more
-   information on sources of entropy.
-
-   .. versionchanged:: 3.5
-      Writable :term:`bytes-like object` is now accepted.
-
 Certificate handling
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -2619,8 +2609,7 @@ for example the :mod:`multiprocessing` or :mod:`concurrent.futures` modules),
 be aware that OpenSSL's internal random number generator does not properly
 handle forked processes.  Applications must change the PRNG state of the
 parent process if they use any SSL feature with :func:`os.fork`.  Any
-successful call of :func:`~ssl.RAND_add`, or :func:`~ssl.RAND_bytes`
-is sufficient.
+successful call of :func:`~ssl.RAND_bytes` is sufficient.
 
 
 .. _ssl-tlsv1_3:
