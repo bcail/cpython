@@ -832,33 +832,6 @@ _ssl_MemoryBIO_write_eof(PySSLMemoryBIO *self, PyObject *Py_UNUSED(ignored))
     return _ssl_MemoryBIO_write_eof_impl(self);
 }
 
-PyDoc_STRVAR(_ssl_RAND_bytes__doc__,
-"RAND_bytes($module, n, /)\n"
-"--\n"
-"\n"
-"Generate n cryptographically strong pseudo-random bytes.");
-
-#define _SSL_RAND_BYTES_METHODDEF    \
-    {"RAND_bytes", (PyCFunction)_ssl_RAND_bytes, METH_O, _ssl_RAND_bytes__doc__},
-
-static PyObject *
-_ssl_RAND_bytes_impl(PyObject *module, int n);
-
-static PyObject *
-_ssl_RAND_bytes(PyObject *module, PyObject *arg)
-{
-    PyObject *return_value = NULL;
-    int n;
-
-    if (!PyArg_Parse(arg, "i:RAND_bytes", &n)) {
-        goto exit;
-    }
-    return_value = _ssl_RAND_bytes_impl(module, n);
-
-exit:
-    return return_value;
-}
-
 PyDoc_STRVAR(_ssl_RAND_status__doc__,
 "RAND_status($module, /)\n"
 "--\n"
@@ -1093,4 +1066,4 @@ exit:
 #ifndef _SSL_ENUM_CRLS_METHODDEF
     #define _SSL_ENUM_CRLS_METHODDEF
 #endif /* !defined(_SSL_ENUM_CRLS_METHODDEF) */
-/*[clinic end generated code: output=fab34ebbff143479 input=a9049054013a1b77]*/
+/*[clinic end generated code: output=68b1bc8382eb5bb3 input=a9049054013a1b77]*/

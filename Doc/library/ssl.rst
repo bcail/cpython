@@ -280,23 +280,6 @@ Exceptions
 Random generation
 ^^^^^^^^^^^^^^^^^
 
-.. function:: RAND_bytes(num)
-
-   Return *num* cryptographically strong pseudo-random bytes. Raises an
-   :class:`SSLError` if the PRNG has not been seeded with enough data or if the
-   operation is not supported by the current RAND method. :func:`RAND_status`
-   can be used to check the status of the PRNG and :func:`RAND_add` can be used
-   to seed the PRNG.
-
-   For almost all applications :func:`os.urandom` is preferable.
-
-   Read the Wikipedia article, `Cryptographically secure pseudorandom number
-   generator (CSPRNG)
-   <https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator>`_,
-   to get the requirements of a cryptographically generator.
-
-   .. versionadded:: 3.3
-
 .. function:: RAND_status()
 
    Return ``True`` if the SSL pseudo-random number generator has been seeded
@@ -2608,8 +2591,7 @@ If using this module as part of a multi-processed application (using,
 for example the :mod:`multiprocessing` or :mod:`concurrent.futures` modules),
 be aware that OpenSSL's internal random number generator does not properly
 handle forked processes.  Applications must change the PRNG state of the
-parent process if they use any SSL feature with :func:`os.fork`.  Any
-successful call of :func:`~ssl.RAND_bytes` is sufficient.
+parent process if they use any SSL feature with :func:`os.fork`.
 
 
 .. _ssl-tlsv1_3:

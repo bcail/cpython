@@ -4959,61 +4959,6 @@ static PyTypeObject PySSLSession_Type = {
 };
 
 
-/* helper routines for seeding the SSL PRNG */
-static PyObject *
-PySSL_RAND(int len, int pseudo)
-{
-    int ok;
-    PyObject *bytes;
-    unsigned long err;
-    const char *errstr;
-    PyObject *v;
-
-    if (len < 0) {
-        PyErr_SetString(PyExc_ValueError, "num must be positive");
-        return NULL;
-    }
-
-    bytes = PyBytes_FromStringAndSize(NULL, len);
-    if (bytes == NULL)
-        return NULL;
-    if (pseudo) {
-        ok = RAND_bytes((unsigned char*)PyBytes_AS_STRING(bytes), len);
-        if (ok == 0 || ok == 1)
-            return Py_BuildValue("NO", bytes, ok == 1 ? Py_True : Py_False);
-    }
-    else {
-        ok = RAND_bytes((unsigned char*)PyBytes_AS_STRING(bytes), len);
-        if (ok == 1)
-            return bytes;
-    }
-    Py_DECREF(bytes);
-
-    err = ERR_get_error();
-    errstr = ERR_reason_error_string(err);
-    v = Py_BuildValue("(ks)", err, errstr);
-    if (v != NULL) {
-        PyErr_SetObject(PySSLErrorObject, v);
-        Py_DECREF(v);
-    }
-    return NULL;
-}
-
-/*[clinic input]
-_ssl.RAND_bytes
-    n: int
-    /
-
-Generate n cryptographically strong pseudo-random bytes.
-[clinic start generated code]*/
-
-static PyObject *
-_ssl_RAND_bytes_impl(PyObject *module, int n)
-/*[clinic end generated code: output=977da635e4838bc7 input=678ddf2872dfebfc]*/
-{
-    return PySSL_RAND(n, 0);
-}
-
 /*[clinic input]
 _ssl.RAND_status
 
@@ -5501,7 +5446,6 @@ _ssl_enum_crls_impl(PyObject *module, const char *store_name)
 /* List of functions exported by this module. */
 static PyMethodDef PySSL_methods[] = {
     _SSL__TEST_DECODE_CERT_METHODDEF
-    _SSL_RAND_BYTES_METHODDEF
     _SSL_RAND_EGD_METHODDEF
     _SSL_RAND_STATUS_METHODDEF
     _SSL_GET_DEFAULT_VERIFY_PATHS_METHODDEF
