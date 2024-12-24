@@ -4959,22 +4959,6 @@ static PyTypeObject PySSLSession_Type = {
 };
 
 
-/*[clinic input]
-_ssl.RAND_status
-
-Returns 1 if the OpenSSL PRNG has been seeded with enough data and 0 if not.
-
-It is necessary to seed the PRNG with RAND_add() on some platforms before
-using the ssl() function.
-[clinic start generated code]*/
-
-static PyObject *
-_ssl_RAND_status_impl(PyObject *module)
-/*[clinic end generated code: output=7e0aaa2d39fdc1ad input=8a774b02d1dc81f3]*/
-{
-    return PyLong_FromLong(RAND_status());
-}
-
 #ifndef OPENSSL_NO_EGD
 /* LCOV_EXCL_START */
 /*[clinic input]
@@ -5447,7 +5431,6 @@ _ssl_enum_crls_impl(PyObject *module, const char *store_name)
 static PyMethodDef PySSL_methods[] = {
     _SSL__TEST_DECODE_CERT_METHODDEF
     _SSL_RAND_EGD_METHODDEF
-    _SSL_RAND_STATUS_METHODDEF
     _SSL_GET_DEFAULT_VERIFY_PATHS_METHODDEF
     _SSL_ENUM_CERTIFICATES_METHODDEF
     _SSL_ENUM_CRLS_METHODDEF

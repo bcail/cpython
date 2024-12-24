@@ -101,7 +101,6 @@ from _ssl import (
     SSLSyscallError, SSLEOFError, SSLCertVerificationError
     )
 from _ssl import txt2obj as _txt2obj, nid2obj as _nid2obj
-from _ssl import RAND_status
 try:
     from _ssl import RAND_egd
 except ImportError:

@@ -832,27 +832,6 @@ _ssl_MemoryBIO_write_eof(PySSLMemoryBIO *self, PyObject *Py_UNUSED(ignored))
     return _ssl_MemoryBIO_write_eof_impl(self);
 }
 
-PyDoc_STRVAR(_ssl_RAND_status__doc__,
-"RAND_status($module, /)\n"
-"--\n"
-"\n"
-"Returns 1 if the OpenSSL PRNG has been seeded with enough data and 0 if not.\n"
-"\n"
-"It is necessary to seed the PRNG with RAND_add() on some platforms before\n"
-"using the ssl() function.");
-
-#define _SSL_RAND_STATUS_METHODDEF    \
-    {"RAND_status", (PyCFunction)_ssl_RAND_status, METH_NOARGS, _ssl_RAND_status__doc__},
-
-static PyObject *
-_ssl_RAND_status_impl(PyObject *module);
-
-static PyObject *
-_ssl_RAND_status(PyObject *module, PyObject *Py_UNUSED(ignored))
-{
-    return _ssl_RAND_status_impl(module);
-}
-
 #if !defined(OPENSSL_NO_EGD)
 
 PyDoc_STRVAR(_ssl_RAND_egd__doc__,
@@ -1066,4 +1045,4 @@ exit:
 #ifndef _SSL_ENUM_CRLS_METHODDEF
     #define _SSL_ENUM_CRLS_METHODDEF
 #endif /* !defined(_SSL_ENUM_CRLS_METHODDEF) */
-/*[clinic end generated code: output=68b1bc8382eb5bb3 input=a9049054013a1b77]*/
+/*[clinic end generated code: output=363ee6be8f8abb2f input=a9049054013a1b77]*/
