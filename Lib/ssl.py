@@ -101,11 +101,6 @@ from _ssl import (
     SSLSyscallError, SSLEOFError, SSLCertVerificationError
     )
 from _ssl import txt2obj as _txt2obj, nid2obj as _nid2obj
-try:
-    from _ssl import RAND_egd
-except ImportError:
-    # LibreSSL does not provide RAND_egd
-    pass
 
 
 from _ssl import (

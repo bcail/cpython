@@ -4959,38 +4959,6 @@ static PyTypeObject PySSLSession_Type = {
 };
 
 
-#ifndef OPENSSL_NO_EGD
-/* LCOV_EXCL_START */
-/*[clinic input]
-_ssl.RAND_egd
-    path: object(converter="PyUnicode_FSConverter")
-    /
-
-Queries the entropy gather daemon (EGD) on the socket named by 'path'.
-
-Returns number of bytes read.  Raises SSLError if connection to EGD
-fails or if it does not provide enough data to seed PRNG.
-[clinic start generated code]*/
-
-static PyObject *
-_ssl_RAND_egd_impl(PyObject *module, PyObject *path)
-/*[clinic end generated code: output=02a67c7c367f52fa input=1aeb7eb948312195]*/
-{
-    int bytes = RAND_egd(PyBytes_AsString(path));
-    Py_DECREF(path);
-    if (bytes == -1) {
-        PyErr_SetString(PySSLErrorObject,
-                        "EGD connection failed or EGD did not return "
-                        "enough data to seed the PRNG");
-        return NULL;
-    }
-    return PyLong_FromLong(bytes);
-}
-/* LCOV_EXCL_STOP */
-#endif /* OPENSSL_NO_EGD */
-
-
-
 /*[clinic input]
 _ssl.get_default_verify_paths
 
@@ -5430,7 +5398,6 @@ _ssl_enum_crls_impl(PyObject *module, const char *store_name)
 /* List of functions exported by this module. */
 static PyMethodDef PySSL_methods[] = {
     _SSL__TEST_DECODE_CERT_METHODDEF
-    _SSL_RAND_EGD_METHODDEF
     _SSL_GET_DEFAULT_VERIFY_PATHS_METHODDEF
     _SSL_ENUM_CERTIFICATES_METHODDEF
     _SSL_ENUM_CRLS_METHODDEF

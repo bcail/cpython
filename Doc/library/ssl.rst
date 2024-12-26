@@ -277,22 +277,6 @@ Exceptions
       The exception is now an alias for :exc:`SSLCertVerificationError`.
 
 
-Random generation
-^^^^^^^^^^^^^^^^^
-
-.. function:: RAND_egd(path)
-
-   If you are running an entropy-gathering daemon (EGD) somewhere, and *path*
-   is the pathname of a socket connection open to it, this will read 256 bytes
-   of randomness from the socket, and add it to the SSL pseudo-random number
-   generator to increase the security of generated secret keys.  This is
-   typically only necessary on systems without better sources of randomness.
-
-   See http://egd.sourceforge.net/ or http://prngd.sourceforge.net/ for sources
-   of entropy-gathering daemons.
-
-   .. availability:: not available with LibreSSL and OpenSSL > 1.1.0.
-
 Certificate handling
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -2576,15 +2560,6 @@ about the `cipher list format <https://www.openssl.org/docs/manmaster/man1/ciphe
 If you want to check which ciphers are enabled by a given cipher list, use
 :meth:`SSLContext.get_ciphers` or the ``openssl ciphers`` command on your
 system.
-
-Multi-processing
-^^^^^^^^^^^^^^^^
-
-If using this module as part of a multi-processed application (using,
-for example the :mod:`multiprocessing` or :mod:`concurrent.futures` modules),
-be aware that OpenSSL's internal random number generator does not properly
-handle forked processes.  Applications must change the PRNG state of the
-parent process if they use any SSL feature with :func:`os.fork`.
 
 
 .. _ssl-tlsv1_3:
